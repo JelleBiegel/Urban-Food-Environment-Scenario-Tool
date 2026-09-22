@@ -21,21 +21,19 @@ from pyproj import CRS
 # CONFIGURATION
 # ---------------------------------------------------------------------
 
-DEFAULT_PROJECT_ROOT = Path(
-    "/Users/jellebiegel/Documents/Thesis/Thesis_Strandeiland"
-)
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 MODEL = Path(
     os.getenv(
         "GAMA_MODEL_PATH",
-        str(DEFAULT_PROJECT_ROOT / "models" / "Food_outlets_on_Strandeiland.gaml"),
+        str(PROJECT_ROOT / "models" / "Food_outlets_on_Strandeiland.gaml"),
     )
 )
 
 OUTPUT = Path(
     os.getenv(
         "GAMA_OUTPUT_PATH",
-        str(DEFAULT_PROJECT_ROOT / "Results" / "web_result.csv"),
+        str(PROJECT_ROOT / "Results" / "web_result.csv"),
     )
 )
 

@@ -1,0 +1,20 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    depends_on:
+      - gama
+    environment:
+      GAMA_URI: ws://gama:6868
+      GAMA_MODEL_PATH: /workspace/models/Food_outlets_on_Strandeiland.gaml
+      GAMA_OUTPUT_PATH: /workspace/Results/web_result.csv
+
+  gama:
+    image: gamaplatform/gama:2025.06.4
+    volumes:
+      - ..:/workspace:cached
+    command:
+      - "-socket"
+      - "6868"

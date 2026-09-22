@@ -1,0 +1,29 @@
+{
+  "name": "Urban Food Environment Scenario Tool",
+
+  "dockerComposeFile": "compose.yaml",
+  "service": "app",
+  "runServices": [
+    "app",
+    "gama"
+  ],
+
+  "workspaceFolder": "/workspace",
+
+  "forwardPorts": [
+    8501
+  ],
+
+  "portsAttributes": {
+    "8501": {
+      "label": "Scenario Tool",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  "postCreateCommand": "python -m pip install -r requirements.txt",
+
+  "postStartCommand": "nohup python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8501 > /tmp/streamlit.log 2>&1 &",
+
+  "shutdownAction": "stopCompose"
+}

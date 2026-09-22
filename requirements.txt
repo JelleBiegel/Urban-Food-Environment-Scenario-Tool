@@ -1,0 +1,6 @@
+streamlit
+websockets
+pyshp
+pyproj
+matplotlib
+pandas

@@ -1,0 +1,750 @@
+<metadata xml:lang="en"><Esri><CreaDate>20260421</CreaDate><CreaTime>14510200</CreaTime><ArcGISFormat>1.0</ArcGISFormat><SyncOnce>FALSE</SyncOnce><DataProperties><itemProps><itemName Sync="TRUE">f0_scenario_400_m_green_realistic</itemName><imsContentType Sync="TRUE">002</imsContentType><itemLocation><linkage Sync="TRUE">file://\\LAPTOP-BGESQJ0J\C$\Users\jelle\Documents\Jelle\MADE\Thesis\2. Data\Strandeiland\ShapeFile for GAMA\Final\Scenarios\f0_scenario_400_m_green_realistic.shp</linkage><protocol Sync="TRUE">Local Area Network</protocol></itemLocation><itemSize Sync="TRUE">0.000</itemSize></itemProps><coordRef><type Sync="TRUE">Projected</type><geogcsn Sync="TRUE">GCS_Amersfoort</geogcsn><csUnits Sync="TRUE">Linear Unit: Meter (1.000000)</csUnits><projcsn Sync="TRUE">RD_New</projcsn><peXml Sync="TRUE">&lt;ProjectedCoordinateSystem xsi:type='typens:ProjectedCoordinateSystem' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/3.6.0'&gt;&lt;WKT&gt;PROJCS[&amp;quot;RD_New&amp;quot;,GEOGCS[&amp;quot;GCS_Amersfoort&amp;quot;,DATUM[&amp;quot;D_Amersfoort&amp;quot;,SPHEROID[&amp;quot;Bessel_1841&amp;quot;,6377397.155,299.1528128]],PRIMEM[&amp;quot;Greenwich&amp;quot;,0.0],UNIT[&amp;quot;Degree&amp;quot;,0.0174532925199433]],PROJECTION[&amp;quot;Double_Stereographic&amp;quot;],PARAMETER[&amp;quot;False_Easting&amp;quot;,155000.0],PARAMETER[&amp;quot;False_Northing&amp;quot;,463000.0],PARAMETER[&amp;quot;Central_Meridian&amp;quot;,5.38763888888889],PARAMETER[&amp;quot;Scale_Factor&amp;quot;,0.9999079],PARAMETER[&amp;quot;Latitude_Of_Origin&amp;quot;,52.15616055555555],UNIT[&amp;quot;Meter&amp;quot;,1.0],AUTHORITY[&amp;quot;EPSG&amp;quot;,28992]]&lt;/WKT&gt;&lt;XOrigin&gt;-30515500&lt;/XOrigin&gt;&lt;YOrigin&gt;-30279500&lt;/YOrigin&gt;&lt;XYScale&gt;146716411.36275291&lt;/XYScale&gt;&lt;ZOrigin&gt;-100000&lt;/ZOrigin&gt;&lt;ZScale&gt;10000&lt;/ZScale&gt;&lt;MOrigin&gt;-100000&lt;/MOrigin&gt;&lt;MScale&gt;10000&lt;/MScale&gt;&lt;XYTolerance&gt;0.001&lt;/XYTolerance&gt;&lt;ZTolerance&gt;0.001&lt;/ZTolerance&gt;&lt;MTolerance&gt;0.001&lt;/MTolerance&gt;&lt;HighPrecision&gt;true&lt;/HighPrecision&gt;&lt;WKID&gt;28992&lt;/WKID&gt;&lt;LatestWKID&gt;28992&lt;/LatestWKID&gt;&lt;/ProjectedCoordinateSystem&gt;</peXml></coordRef><lineage><Process Name="Copy Features (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CopyFeatures" Date="20260408" Time="144056">CopyFeatures "C:\Users\jelle\Documents\Jelle\MADE\Thesis\2. Data\Strandeiland\Vectorshape_bouwaanduiding.shp" C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Vectorshape_bouwaanduiding # # # #</Process><Process Name="Delete Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260408" Time="145014">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Vectorshape_bouwaanduiding namespace;lokaalID;typePlanob;tekst;hoek DELETE_FIELDS</Process><Process ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CopyMultiple" Date="20260421" Time="145103">CopyMultiple "C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Vectorshape_bouwaanduiding FeatureClass" C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Source_database.gdb Vectorshape_bouwaanduiding "Vectorshape_bouwaanduiding FeatureClass Vectorshape_bouwaanduiding #"</Process><Process Name="Merge" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\Merge" Date="20260421" Time="162214">Merge C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Source_database.gdb\Vectorshape_bouwaanduiding;C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Source_database.gdb\Vectorshape_bouwvlak C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen # NO_SOURCE_INFO AUTOMATIC</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260422" Time="160332">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260422" Time="160610">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature LONG # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="092825">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="092825">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature LONG # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="092826">CalculateField Polygon_gebouwen_Layer Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="092929">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Delete Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="093000">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="093009">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="093010">CalculateField Polygon_gebouwen_Layer1 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="093114">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="093115">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="093116">CalculateField Polygon_gebouwen_Layer3 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="093151">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="093152">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="093153">CalculateField Polygon_gebouwen_Layer4 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="093923">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="093924">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="093927">CalculateField Polygon_gebouwen_Layer5 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="094152">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="094152">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="094157">CalculateField Polygon_gebouwen_Layer6 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="104628">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="104629">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # # Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="104631">CalculateField Polygon_gebouwen_Layer7 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="110657">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="110711">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen gml_id DELETE_FIELDS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="111043">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="111044">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # 6 Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="111048">CalculateField Polygon_gebouwen_Layer Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="112741">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="112742">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # 6 Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="112746">CalculateField Polygon_gebouwen_Layer Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="112919">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="112920">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen Nature TEXT # # 6 Nature NULLABLE NON_REQUIRED #</Process><Process Name="Copy Features" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CopyFeatures" Date="20260423" Time="112923">CopyFeatures C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\Polygon_gebouwen C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 # # # #</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="133540">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 naam;Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260423" Time="133541">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 Nature TEXT # # 6 Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260423" Time="133543">CalculateField Buildings_indiv_Strandeiland Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260423" Time="133545">DeleteField Buildings_indiv_Strandeiland naam DELETE_FIELDS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260428" Time="112443">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 naam;Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260428" Time="112443">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 Nature TEXT # # 20 Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260428" Time="112445">CalculateField Buildings_indiv_Strandeiland Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260428" Time="112447">DeleteField Buildings_indiv_Strandeiland naam DELETE_FIELDS</Process><Process Name="Delete Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260428" Time="112922">DeleteField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 naam;Nature DELETE_FIELDS</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260428" Time="112922">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 Nature TEXT # # 20 Nature NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260428" Time="112923">CalculateField Buildings_indiv_Strandeiland1 Nature 'School' PYTHON3 # LONG NO_ENFORCE_DOMAINS</Process><Process Name="Delete Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\DeleteField" Date="20260428" Time="112924">DeleteField Buildings_indiv_Strandeiland1 naam DELETE_FIELDS</Process><Process Name="Export Features" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Conversion Tools.tbx\ExportFeatures" Date="20260428" Time="112926">ExportFeatures C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1 C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep # NOT_USE_ALIAS "Shape_Length "Shape_Length" false true true 8 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1,Shape_Length,-1,-1;Shape_Area "Shape_Area" false true true 8 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1,Shape_Area,-1,-1;Nature "Nature" true true false 20 Text 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Final_Thesis.gdb\Buildings_indiv_Strandeiland_1,Nature,0,19" #</Process><Process Name="Add Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260428" Time="112935">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260428" Time="112936">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260428" Time="112936">CalculateField a23_building_prep_Layer2 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260428" Time="112937">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="163329">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="163331">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="163332">CalculateField a23_building_prep_Layer Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="163333">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="163335">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="164139">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164139">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164140">CalculateField a23_building_prep_Layer2 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164142">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164143">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="164306">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164306">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164306">CalculateField a23_building_prep_Layer3 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164306">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164307">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164356">CalculateField a23_building_prep_Layer3 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164407">CalculateField a23_building_prep_Layer4 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="164704">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164705">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164706">CalculateField a23_building_prep_Layer5 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164706">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164707">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="164803">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164805">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164805">CalculateField a23_building_prep_Layer6 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164806">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164806">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="164853">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164854">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164855">CalculateField a23_building_prep_Layer7 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164856">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="164856">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="165103">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165104">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165105">CalculateField a23_building_prep_Layer8 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165105">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165105">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="165229">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165230">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165231">CalculateField a23_building_prep_Layer9 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="165315">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165315">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165316">CalculateField a23_building_prep_Layer10 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165316">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165316">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="165352">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165353">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165353">CalculateField a23_building_prep_Layer11 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165353">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165353">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260504" Time="165649">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165650">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165650">CalculateField a23_building_prep_Layer12 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165650">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260504" Time="165650">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260506" Time="185548">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260506" Time="185549">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260506" Time="185549">CalculateField a23_building_prep_Layer Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260506" Time="185550">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260506" Time="185550">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="103753">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="103754">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="103800">CalculateField a23_building_prep_Layer Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="103809">CalculateField a23_building_prep_Layer2 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104407">CalculateField a23_building_prep_Layer2 Nature assign_type() PYTHON3 "import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else: 
+        return """ TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104424">CalculateField a23_building_prep_Layer2 Nature assign_type() PYTHON3 "import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else: 
+        return """ TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104445">CalculateField a23_building_prep_Layer2 Nature assign_type() PYTHON3 "import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else: 
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104918">CalculateField a23_building_prep_Layer2 Nature assign_type PYTHON3 "import random
+
+import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Add RandNumb" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\AddField" Date="20260507" Time="104944">AddField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum DOUBLE # # # # NULLABLE NON_REQUIRED #</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104944">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep RandNum getRandom() PYTHON3 "import random
+def getRandom():
+    return random.random()" TEXT ENFORCE_DOMAINS</Process><Process Name="Calculate Field (3)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104944">CalculateField a23_building_prep_Layer3 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104945">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104945">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104948">CalculateField a23_building_prep_Layer4 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="104948">CalculateField a23_building_prep_Layer4 Nature assign_type PYTHON3 "import random
+
+import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="114523">CalculateField a23_building_prep_Layer4 Nature assign_type() PYTHON3 "import random
+
+import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="114619">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep Nature assign_type() PYTHON3 "import random
+
+import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="120453">CalculateField a23_building_prep_Layer5 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="120544">CalculateField a23_building_prep_Layer6 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260507" Time="120544">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep Nature assign_type() PYTHON3 "import random
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    elif roll &lt;= 7:
+        return "Sweet shop"
+    elif roll &lt;= 8:
+        return "Pastry shop"
+    elif roll &lt;= 9:
+        return "Drug store"
+    elif roll &lt;= 10:
+        return "Ice cream shop"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260511" Time="130623">CalculateField a23_building_prep_Layer1 Nature 'Fastfood' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (5)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260511" Time="130623">CalculateField a23_building_prep_Layer Nature 'Supermarket' PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Copy Features" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CopyFeatures" Date="20260511" Time="131729">CopyFeatures C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_prep_CopyFeatures2 # # # #</Process><Process Name="Subdivide Polygon" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\SubdividePolygon" Date="20260511" Time="131733">SubdividePolygon a23_building_prep_CopyFeatur7 C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_p_SubdividePoly3 NUMBER_OF_EQUAL_PARTS 20 # # 0 STACKED_BLOCKS</Process><Process Name="Merge" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\Merge" Date="20260518" Time="161413">Merge C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_p_SubdividePoly3;C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_building_p_SubdividePoly4;a23_building_prep_CopyFeatur C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size # NO_SOURCE_INFO AUTOMATIC</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="162915">CalculateField a23_realistic_building_size_1 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="162915">CalculateField a23_realistic_building_size_2 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="162916">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_type() PYTHON3 "import arcpy
+import random
+
+import random
+shop_probalities = {
+"Residential": 1500,     # The vast majority of buildings
+    "Fastfood": 15,          # Common
+    "Supermarket": 10,       # Common
+    "Grillroom": 8,
+    "Sweet shop": 3,
+    "Liquor store": 3,
+    "Tobacconist": 4,
+    "Gas station": 2,
+    "Pastry shop": 4,
+    "Chocolate shop": 2,
+    "Drug store": 6,
+    "Ice cream shop": 4,
+    "Take-away": 10,
+    "Pancake restaurant": 1,
+    "Café": 8,
+    "Night shop": 2,
+    "Café-restaurant": 6,
+    "Lunchroom": 7,
+    "Cheese store": 3,
+    "Restaurant": 12,
+    "Butcher": 4,
+    "Delicacies shop": 2,
+    "Mini mart": 5,
+    "poulterer": 2,
+    "Reform/bio shop": 3,
+    "Bakery": 8,
+    "Coffee/tea shop": 7,
+    "Asian supermarket": 2,
+    "Turkish Supermarket": 3,
+    "Nut shop": 2,
+    "Fish store": 3,
+    "Vegetable store": 4
+}
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    elif roll &lt;= 7:
+        return "Ice cream"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="162924">CalculateField a23_realistic_building_size_3 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163047">CalculateField a23_realistic_building_size_ Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163048">CalculateField a23_realistic_building_size_1 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163048">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_type() PYTHON3 "import arcpy
+import random
+
+import random
+shop_probalities = {
+"Residential": 1500,     # The vast majority of buildings
+    "Fastfood": 15,          # Common
+    "Supermarket": 10,       # Common
+    "Grillroom": 8,
+    "Sweet shop": 3,
+    "Liquor store": 3,
+    "Tobacconist": 4,
+    "Gas station": 2,
+    "Pastry shop": 4,
+    "Chocolate shop": 2,
+    "Drug store": 6,
+    "Ice cream shop": 4,
+    "Take-away": 10,
+    "Pancake restaurant": 1,
+    "Café": 8,
+    "Night shop": 2,
+    "Café-restaurant": 6,
+    "Lunchroom": 7,
+    "Cheese store": 3,
+    "Restaurant": 12,
+    "Butcher": 4,
+    "Delicacies shop": 2,
+    "Mini mart": 5,
+    "poulterer": 2,
+    "Reform/bio shop": 3,
+    "Bakery": 8,
+    "Coffee/tea shop": 7,
+    "Asian supermarket": 2,
+    "Turkish Supermarket": 3,
+    "Nut shop": 2,
+    "Fish store": 3,
+    "Vegetable store": 4
+}
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    elif roll &lt;= 7:
+        return "Ice cream"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163126">CalculateField a23_realistic_building_size_2 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163127">CalculateField a23_realistic_building_size_3 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163128">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_type() PYTHON3 "import arcpy
+import random
+
+import random
+shop_probalities = {
+"Residential": 1500,     # The vast majority of buildings
+    "Fastfood": 15,          # Common
+    "Supermarket": 10,       # Common
+    "Grillroom": 8,
+    "Sweet shop": 3,
+    "Liquor store": 3,
+    "Tobacconist": 4,
+    "Gas station": 2,
+    "Pastry shop": 4,
+    "Chocolate shop": 2,
+    "Drug store": 6,
+    "Ice cream shop": 4,
+    "Take-away": 10,
+    "Pancake restaurant": 1,
+    "Café": 8,
+    "Night shop": 2,
+    "Café-restaurant": 6,
+    "Lunchroom": 7,
+    "Cheese store": 3,
+    "Restaurant": 12,
+    "Butcher": 4,
+    "Delicacies shop": 2,
+    "Mini mart": 5,
+    "poulterer": 2,
+    "Reform/bio shop": 3,
+    "Bakery": 8,
+    "Coffee/tea shop": 7,
+    "Asian supermarket": 2,
+    "Turkish Supermarket": 3,
+    "Nut shop": 2,
+    "Fish store": 3,
+    "Vegetable store": 4
+}
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    elif roll &lt;= 7:
+        return "Ice cream"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163327">CalculateField a23_realistic_building_size_4 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163639">CalculateField a23_realistic_building_size_6 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163640">CalculateField a23_realistic_building_size_7 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="163640">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_type() PYTHON3 "import arcpy
+import random
+
+import random
+shop_probalities = {
+"Residential": 1500,     # The vast majority of buildings
+    "Fastfood": 15,          # Common
+    "Supermarket": 10,       # Common
+    "Grillroom": 8,
+    "Sweet shop": 3,
+    "Liquor store": 3,
+    "Tobacconist": 4,
+    "Gas station": 2,
+    "Pastry shop": 4,
+    "Chocolate shop": 2,
+    "Drug store": 6,
+    "Ice cream shop": 4,
+    "Take-away": 10,
+    "Pancake restaurant": 1,
+    "Café": 8,
+    "Night shop": 2,
+    "Café-restaurant": 6,
+    "Lunchroom": 7,
+    "Cheese store": 3,
+    "Restaurant": 12,
+    "Butcher": 4,
+    "Delicacies shop": 2,
+    "Mini mart": 5,
+    "poulterer": 2,
+    "Reform/bio shop": 3,
+    "Bakery": 8,
+    "Coffee/tea shop": 7,
+    "Asian supermarket": 2,
+    "Turkish Supermarket": 3,
+    "Nut shop": 2,
+    "Fish store": 3,
+    "Vegetable store": 4
+}
+
+def assign_type():
+    roll = random.randint(1, 100)
+    
+    if roll &lt;= 5:
+        return "Fastfood"
+    elif roll &lt;= 6:
+        return "Supermarket"
+    elif roll &lt;= 7:
+        return "Ice cream"
+    else:
+        return "Nature"" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="164850">CalculateField a23_realistic_building_size_8 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="164851">CalculateField a23_realistic_building_size_9 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="164926">CalculateField a23_realistic_building_size_10 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="164926">CalculateField a23_realistic_building_size_11 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="165105">CalculateField a23_realistic_building_size_12 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="165106">CalculateField a23_realistic_building_size_13 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260518" Time="165106">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Liquor store": 3,
+        "Tobacconist": 4,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105722">CalculateField a23_realistic_building_size_ Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105723">CalculateField a23_realistic_building_size_1 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105723">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105903">CalculateField a23_realistic_building_size_2 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105904">CalculateField a23_realistic_building_size_3 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105904">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105924">CalculateField a23_realistic_building_size_4 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105925">CalculateField a23_realistic_building_size_5 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="105925">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="110538">CalculateField a23_realistic_building_size_6 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="110540">CalculateField a23_realistic_building_size_7 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="110540">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111052">CalculateField a23_realistic_building_size_8 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111053">CalculateField a23_realistic_building_size_9 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111053">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111313">CalculateField a23_realistic_building_size_10 Nature "" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111322">CalculateField a23_realistic_building_size_11 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111324">CalculateField a23_realistic_building_size_12 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111324">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111509">CalculateField a23_realistic_building_size_13 Nature "" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111540">CalculateField a23_realistic_building_size_14 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111542">CalculateField a23_realistic_building_size_15 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111542">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="111734">CalculateField a23_realistic_building_size_16 Nature "" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="112035">CalculateField a23_realistic_building_size_17 Nature "School" PYTHON3 # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (4)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="112037">CalculateField a23_realistic_building_size_18 Nature "" ARCADE # TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Calculate Field (6)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260520" Time="112038">CalculateField C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Fastfood": 15,
+        "Supermarket": 10,
+        "Grillroom": 8,
+        "Sweet shop": 3,
+        "Gas station": 2,
+        "Pastry shop": 4,
+        "Chocolate shop": 2,
+        "Drug store": 6,
+        "Ice cream shop": 4,
+        "Take-away": 10,
+        "Pancake restaurant": 1,
+        "Café": 8,
+        "Night shop": 2,
+        "Café-restaurant": 6,
+        "Lunchroom": 7,
+        "Cheese store": 3,
+        "Restaurant": 12,
+        "Butcher": 4,
+        "Delicacies shop": 2,
+        "Mini mart": 5,
+        "poulterer": 2,
+        "Reform/bio shop": 3,
+        "Bakery": 8,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Export Features" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Conversion Tools.tbx\ExportFeatures" Date="20260520" Time="112049">ExportFeatures C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size "G:\Other computers\My MacBook Pro\Documents\Thesis\Thesis_Strandeiland\Data\a23_buildings_random_food_outlets.shp" # NOT_USE_ALIAS "Nature "Nature" true true false 20 Text 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size,Nature,0,19;RandNum "RandNum" true true false 8 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size,RandNum,-1,-1;Shape_Length "Shape_Length" false true true 8 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size,Shape_Length,-1,-1;Shape_Area "Shape_Area" false true true 8 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\a23_realistic_building_size,Shape_Area,-1,-1" #</Process><Process Name="Copy Features" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CopyFeatures" Date="20260611" Time="154718">CopyFeatures "G:\Other computers\My MacBook Pro\Documents\Thesis\Thesis_Strandeiland\Data\a23_buildings_random_food_outlets.shp" C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\scenario_1_400_m_green_realistic # # # #</Process><Process Name="Calculate Field (2)" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Data Management Tools.tbx\CalculateField" Date="20260611" Time="154721">CalculateField scenario_1_400_m_green_reali5 Nature assign_shop_type(!Nature!) PYTHON3 "import random
+
+def assign_shop_type(current_value):
+    # If the row is already assigned as a School, return it exactly as it is (skips it)
+    if current_value == "School":
+        return current_value
+        
+    # The complete relative probability dictionary 
+    shop_probabilities = {
+        "Residential": 1500,
+        "Coffee/tea shop": 7,
+        "Asian supermarket": 2,
+        "Turkish Supermarket": 3,
+        "Nut shop": 2,
+        "Fish store": 3,
+        "Vegetable store": 4
+    }
+    
+    types = list(shop_probabilities.keys())
+    weights = list(shop_probabilities.values())
+    
+    # Pick a random weighted type
+    return random.choices(types, weights=weights, k=1)[0]" TEXT NO_ENFORCE_DOMAINS</Process><Process Name="Export Features" ToolSource="c:\program files\arcgis\pro\Resources\ArcToolbox\toolboxes\Conversion Tools.tbx\ExportFeatures" Date="20260611" Time="154722">ExportFeatures C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\scenario_1_400_m_green_realistic "C:\Users\jelle\Documents\Jelle\MADE\Thesis\2. Data\Strandeiland\ShapeFile for GAMA\Final\Scenarios\f0_scenario_400_m_green_realistic.shp" # NOT_USE_ALIAS "Nature "Nature" true false false 20 Text 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\scenario_1_400_m_green_realistic,Nature,0,19;RandNum "RandNum" true false false 19 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\scenario_1_400_m_green_realistic,RandNum,-1,-1;Shape_Leng "Shape_Leng" true false false 19 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\scenario_1_400_m_green_realistic,Shape_Leng,-1,-1;Shape_Area "Shape_Area" true false false 19 Double 0 0,First,#,C:\Users\jelle\Documents\ArcGIS\Projects\Thesis\Working_Thesis.gdb\scenario_1_400_m_green_realistic,Shape_Area,-1,-1" #</Process></lineage></DataProperties><SyncDate>20260611</SyncDate><SyncTime>15472200</SyncTime><ModDate>20260611</ModDate><ModTime>15472200</ModTime></Esri><dataIdInfo><envirDesc Sync="TRUE">Microsoft Windows 10 Version 10.0 (Build 26200) ; Esri ArcGIS 13.6.0.59527</envirDesc><dataLang><languageCode value="eng" Sync="TRUE"></languageCode><countryCode value="USA" Sync="TRUE"></countryCode></dataLang><idCitation><resTitle Sync="TRUE">f0_scenario_400_m_green_realistic</resTitle><presForm><PresFormCd value="005" Sync="TRUE"></PresFormCd></presForm></idCitation><spatRpType><SpatRepTypCd value="001" Sync="TRUE"></SpatRepTypCd></spatRpType></dataIdInfo><mdLang><languageCode value="eng" Sync="TRUE"></languageCode><countryCode value="USA" Sync="TRUE"></countryCode></mdLang><distInfo><distFormat><formatName Sync="TRUE">Shapefile</formatName></distFormat><distTranOps><transSize Sync="TRUE">0.000</transSize></distTranOps></distInfo><mdHrLv><ScopeCd value="005" Sync="TRUE"></ScopeCd></mdHrLv><mdHrLvName Sync="TRUE">dataset</mdHrLvName><refSysInfo><RefSystem><refSysID><identCode code="28992" Sync="TRUE"></identCode><idCodeSpace Sync="TRUE">EPSG</idCodeSpace><idVersion Sync="TRUE">4.5(8.0.1)</idVersion></refSysID></RefSystem></refSysInfo><spatRepInfo><VectSpatRep><geometObjs Name="f0_scenario_400_m_green_realistic"><geoObjTyp><GeoObjTypCd value="002" Sync="TRUE"></GeoObjTypCd></geoObjTyp><geoObjCnt Sync="TRUE">0</geoObjCnt></geometObjs><topLvl><TopoLevCd value="001" Sync="TRUE"></TopoLevCd></topLvl></VectSpatRep></spatRepInfo><spdoinfo><ptvctinf><esriterm Name="f0_scenario_400_m_green_realistic"><efeatyp Sync="TRUE">Simple</efeatyp><efeageom code="4" Sync="TRUE"></efeageom><esritopo Sync="TRUE">FALSE</esritopo><efeacnt Sync="TRUE">0</efeacnt><spindex Sync="TRUE">FALSE</spindex><linrefer Sync="TRUE">FALSE</linrefer></esriterm></ptvctinf></spdoinfo><eainfo><detailed Name="f0_scenario_400_m_green_realistic"><enttyp><enttypl Sync="TRUE">f0_scenario_400_m_green_realistic</enttypl><enttypt Sync="TRUE">Feature Class</enttypt><enttypc Sync="TRUE">0</enttypc></enttyp><attr><attrlabl Sync="TRUE">FID</attrlabl><attalias Sync="TRUE">FID</attalias><attrtype Sync="TRUE">OID</attrtype><attwidth Sync="TRUE">4</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdef Sync="TRUE">Internal feature number.</attrdef><attrdefs Sync="TRUE">Esri</attrdefs><attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv></attr><attr><attrlabl Sync="TRUE">Shape</attrlabl><attalias Sync="TRUE">Shape</attalias><attrtype Sync="TRUE">Geometry</attrtype><attwidth Sync="TRUE">0</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdef Sync="TRUE">Feature geometry.</attrdef><attrdefs Sync="TRUE">Esri</attrdefs><attrdomv><udom Sync="TRUE">Coordinates defining the features.</udom></attrdomv></attr><attr><attrlabl Sync="TRUE">Nature</attrlabl><attalias Sync="TRUE">Nature</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">20</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">RandNum</attrlabl><attalias Sync="TRUE">RandNum</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">19</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">Shape_Leng</attrlabl><attalias Sync="TRUE">Shape_Leng</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">19</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">Shape_Area</attrlabl><attalias Sync="TRUE">Shape_Area</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">19</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdef Sync="TRUE">Area of feature in internal units squared.</attrdef><attrdefs Sync="TRUE">Esri</attrdefs><attrdomv><udom Sync="TRUE">Positive real numbers that are automatically generated.</udom></attrdomv></attr></detailed></eainfo><mdDateSt Sync="TRUE">20260611</mdDateSt></metadata>

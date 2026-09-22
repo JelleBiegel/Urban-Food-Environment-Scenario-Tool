@@ -11,7 +11,7 @@ services:
       GAMA_MODEL_PATH: /workspace/models/Food_outlets_on_Strandeiland.gaml
       GAMA_OUTPUT_PATH: /workspace/Results/web_result.csv
 
-  gama:
+    gama:
     image: gamaplatform/gama:2025.06.4
     volumes:
       - ..:/workspace:cached

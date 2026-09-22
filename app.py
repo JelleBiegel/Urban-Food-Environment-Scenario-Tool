@@ -23,6 +23,9 @@ from pyproj import CRS
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
+RUNTIME_DIR = PROJECT_ROOT / ".runtime"
+RUNTIME_DIR.mkdir(exist_ok=True)
+
 MODEL = Path(
     os.getenv(
         "GAMA_MODEL_PATH",
@@ -90,7 +93,10 @@ def prepare_shapefile(uploaded_zip):
     """Extract one shapefile ZIP and return the .shp path."""
 
     upload_folder = Path(
-        tempfile.mkdtemp(prefix="food_environment_")
+    tempfile.mkdtemp(
+        prefix="food_environment_",
+        dir=RUNTIME_DIR
+        )
     )
 
     zip_path = upload_folder / "uploaded_environment.zip"

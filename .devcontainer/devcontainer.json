@@ -11,19 +11,20 @@
   "workspaceFolder": "/workspaces/Urban-Food-Environment-Scenario-Tool",
 
   "forwardPorts": [
-    8501
+    8503
   ],
 
   "portsAttributes": {
-    "8501": {
+    "8503": {
       "label": "Scenario Tool",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "notify",
+      "protocol": "http"
     }
   },
 
   "postCreateCommand": "python -m pip install -r requirements.txt",
 
-  "postStartCommand": "nohup python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8501 > /tmp/streamlit.log 2>&1 &",
+  "postStartCommand": "nohup python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8503 > /tmp/streamlit.log 2>&1 &",
 
   "shutdownAction": "stopCompose"
 }

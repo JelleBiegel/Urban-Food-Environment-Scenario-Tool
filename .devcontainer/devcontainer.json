@@ -24,7 +24,5 @@
 
   "postCreateCommand": "python -m pip install -r requirements.txt",
 
-  "postAttachCommand": "pgrep -f 'streamlit run app.py.*8505' >/dev/null || nohup python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8505 > /tmp/streamlit.log 2>&1 &",
-  
   "shutdownAction": "stopCompose"
 }

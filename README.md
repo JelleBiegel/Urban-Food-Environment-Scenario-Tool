@@ -63,7 +63,9 @@ python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8505
 **# Codespaces troubleshooting: blank page**
 During testing, GitHub Codespaces occasionally retained a stale port-forwarding state after restarting a Codespace. In this situation, the Streamlit server may be running correctly while the previously used forwarded port displays a blank page.
 If this happens, start Streamlit using another unused port, for example:
+```bash
 python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8506
+```
 Then open port 8506 from the Ports tab.
 This behaviour appears to be related to Codespaces port forwarding rather than the scenario tool itself.
 

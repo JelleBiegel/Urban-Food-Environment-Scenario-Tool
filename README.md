@@ -4,7 +4,7 @@ This repository contains the code for an Agent-Based Model (ABM) developed to ex
 
 The model simulates a complete school week five times. In each simulation run, 100 adolescents make one lunch decision per school day.
 
-The ABM is written in GAMA using the GAML modelling language. The model code can be adapted or extended based on the user's own research questions, assumptions or ambitions.
+The ABM is written in GAMA using the GAML modelling language. The model code may be copied and consequently adapted or extended elsewhere based on the user's own research questions, assumptions or ambitions.
 
 In addition, this repository contains a Streamlit-based frontend application that allows users to configure and run the model without directly working in GAMA. The application communicates with GAMA in headless mode. This makes it possible to use the ABM through a browser-based interface, including on devices where installing GAMA locally may not be possible.
 

@@ -59,6 +59,7 @@ In the Codespaces terminal, run:
 ```bash
 python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8505
 ```
+Then open the consequent page through the pop-up or the "Ports" tab next to the "Terminal" Tab.
 
 **# Codespaces troubleshooting: blank page**
 During testing, GitHub Codespaces occasionally retained a stale port-forwarding state after restarting a Codespace. In this situation, the Streamlit server may be running correctly while the previously used forwarded port displays a blank page.

@@ -379,7 +379,7 @@ def load_amsterdam_buildings(neighbourhood_geometry):
         "type": "FeatureCollection",
         "features": selected_features,
     }
-    OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 
 
 def classify_osm_poi(tags):

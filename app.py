@@ -509,7 +509,7 @@ def load_osm_food_environment(neighbourhood_geometry):
 
     data = run_overpass_query(query)
 
-    data = response.json()
+
 
     pois = []
 

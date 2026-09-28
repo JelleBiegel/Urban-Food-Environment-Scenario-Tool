@@ -16,6 +16,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from pyproj import CRS
 
+import requests
 
 # ---------------------------------------------------------------------
 # CONFIGURATION
@@ -193,7 +194,57 @@ def get_value_counts(shp_path, field_name):
 
         return counts
 
+AMSTERDAM_NEIGHBOURHOODS_URL = (
+    "https://api.data.amsterdam.nl/v1/gebieden/buurten/"
+)
 
+
+@st.cache_data(ttl=86400)
+
+def load_amsterdam_neighbourhoods():
+    """Load all Amsterdam neighbourhoods from the official Amsterdam API."""
+
+    neighbourhoods = []
+
+    url = AMSTERDAM_NEIGHBOURHOODS_URL
+    params = {
+        "_pageSize": 500,
+        "_sort": "naam",
+    }
+
+    while url:
+        response = requests.get(
+            url,
+            params=params,
+            headers={"Accept": "application/hal+json"},
+            timeout=30,
+        )
+        response.raise_for_status()
+
+        data = response.json()
+
+        records = data.get("_embedded", {}).get("buurten", [])
+
+        for record in records:
+            neighbourhoods.append(
+                {
+                    "name": record.get("naam"),
+                    "code": record.get("code"),
+                    "id": record.get("identificatie"),
+                    "geometry": record.get("geometrie"),
+                }
+            )
+
+        next_link = data.get("_links", {}).get("next")
+
+        if next_link:
+            url = next_link["href"]
+            params = None
+        else:
+            url = None
+
+    return neighbourhoods
+    
 def normalize_building_type_field(
     shp_path,
     selected_field,
@@ -723,6 +774,45 @@ if "scenario_results" not in st.session_state:
 # ---------------------------------------------------------------------
 
 st.header("1. Study area")
+
+st.subheader("Amsterdam neighbourhood prototype")
+
+try:
+    amsterdam_neighbourhoods = load_amsterdam_neighbourhoods()
+
+    neighbourhood_names = [
+        neighbourhood["name"]
+        for neighbourhood in amsterdam_neighbourhoods
+        if neighbourhood["name"]
+    ]
+
+    selected_neighbourhood_name = st.selectbox(
+        "Select an Amsterdam neighbourhood",
+        neighbourhood_names,
+        index=None,
+        placeholder="Choose a neighbourhood...",
+    )
+
+    if selected_neighbourhood_name:
+        selected_neighbourhood = next(
+            neighbourhood
+            for neighbourhood in amsterdam_neighbourhoods
+            if neighbourhood["name"] == selected_neighbourhood_name
+        )
+
+        st.success(
+            f"Selected neighbourhood: {selected_neighbourhood_name}"
+        )
+
+        st.caption(
+            f"Neighbourhood code: "
+            f"{selected_neighbourhood.get('code', 'Unknown')}"
+        )
+
+except Exception as exc:
+    st.error(
+        f"Could not load Amsterdam neighbourhoods: {exc}"
+    )
 
 st.caption(
     "Upload one ZIP per GIS layer. Each ZIP should contain one "

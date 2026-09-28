@@ -17,8 +17,9 @@ from matplotlib.patches import Patch
 from pyproj import CRS
 
 import requests
-
 import pydeck as pdk
+from shapely.geometry import shape
+
 # ---------------------------------------------------------------------
 # CONFIGURATION
 # ---------------------------------------------------------------------
@@ -303,7 +304,80 @@ def get_geometry_center(geometry):
         "longitude": sum(longitudes) / len(longitudes),
         "latitude": sum(latitudes) / len(latitudes),
     }
-    
+
+AMSTERDAM_BAG_WFS_URL = (
+    "https://api.data.amsterdam.nl/v1/wfs/bag/"
+)
+
+
+def get_geometry_bounds(geometry):
+    """Return min/max longitude and latitude of a GeoJSON geometry."""
+
+    geom = shape(geometry)
+
+    min_lon, min_lat, max_lon, max_lat = geom.bounds
+
+    return min_lon, min_lat, max_lon, max_lat
+
+
+@st.cache_data(ttl=86400)
+def load_amsterdam_buildings(neighbourhood_geometry):
+    """
+    Load BAG building polygons around the selected neighbourhood
+    and retain only buildings intersecting the neighbourhood.
+    """
+
+    neighbourhood_shape = shape(
+        neighbourhood_geometry
+    )
+
+    min_lon, min_lat, max_lon, max_lat = (
+        get_geometry_bounds(
+            neighbourhood_geometry
+        )
+    )
+
+    response = requests.get(
+        AMSTERDAM_BAG_WFS_URL,
+        params={
+            "SERVICE": "WFS",
+            "VERSION": "2.0.0",
+            "REQUEST": "GetFeature",
+            "TYPENAMES": "app:panden",
+            "OUTPUTFORMAT": "geojson",
+            "SRSNAME": "urn:ogc:def:crs:OGC::CRS84",
+            "BBOX": (
+                f"{min_lon},{min_lat},"
+                f"{max_lon},{max_lat},"
+                "urn:ogc:def:crs:OGC::CRS84"
+            ),
+        },
+        timeout=60,
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    selected_features = []
+
+    for feature in data.get("features", []):
+        geometry = feature.get("geometry")
+
+        if geometry is None:
+            continue
+
+        building_shape = shape(geometry)
+
+        if building_shape.intersects(
+            neighbourhood_shape
+        ):
+            selected_features.append(feature)
+
+    return {
+        "type": "FeatureCollection",
+        "features": selected_features,
+    }
 def normalize_building_type_field(
     shp_path,
     selected_field,
@@ -872,6 +946,16 @@ try:
                 selected_neighbourhood["id"]
             )
         )
+                neighbourhood_buildings = (
+            load_amsterdam_buildings(
+                neighbourhood_geometry
+            )
+        )
+
+        st.caption(
+            f"{len(neighbourhood_buildings['features'])} "
+            f"building polygons loaded."
+        )
 
         neighbourhood_center = get_geometry_center(
             neighbourhood_geometry
@@ -884,7 +968,16 @@ try:
             },
             "geometry": neighbourhood_geometry,
         }
-
+        buildings_layer = pdk.Layer(
+            "GeoJsonLayer",
+            neighbourhood_buildings,
+            pickable=True,
+            stroked=True,
+            filled=True,
+            get_fill_color=[210, 210, 210, 180],
+            get_line_color=[120, 120, 120],
+            line_width_min_pixels=0.5,
+        )
         neighbourhood_layer = pdk.Layer(
             "GeoJsonLayer",
             neighbourhood_feature,
@@ -897,7 +990,9 @@ try:
         )
 
         neighbourhood_map = pdk.Deck(
-            layers=[neighbourhood_layer],
+            layers=[buildings_layer,
+                    neighbourhood_layer
+            ],
             initial_view_state=pdk.ViewState(
                 latitude=neighbourhood_center["latitude"],
                 longitude=neighbourhood_center["longitude"],

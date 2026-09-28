@@ -18,6 +18,7 @@ from pyproj import CRS
 
 import requests
 
+import pydeck as pdk
 # ---------------------------------------------------------------------
 # CONFIGURATION
 # ---------------------------------------------------------------------
@@ -244,6 +245,64 @@ def load_amsterdam_neighbourhoods():
             url = None
 
     return neighbourhoods
+
+@st.cache_data(ttl=86400)
+def load_amsterdam_neighbourhood_geometry(neighbourhood_id):
+    """Load the geometry of one selected Amsterdam neighbourhood."""
+
+    response = requests.get(
+        AMSTERDAM_NEIGHBOURHOODS_URL,
+        params={
+            "identificatie": neighbourhood_id,
+            "_pageSize": 1,
+            "_fields": "naam,identificatie,geometrie",
+        },
+        headers={
+            "Accept": "application/hal+json",
+            "Accept-Crs": "urn:ogc:def:crs:OGC::CRS84",
+        },
+        timeout=60,
+    )
+
+    response.raise_for_status()
+    data = response.json()
+
+    records = data.get("_embedded", {}).get("buurten", [])
+
+    if not records:
+        raise ValueError(
+            "No geometry was found for the selected neighbourhood."
+        )
+
+    return records[0]["geometrie"]
+
+
+def get_geometry_center(geometry):
+    """Calculate an approximate centre for Polygon/MultiPolygon GeoJSON."""
+
+    coordinate_pairs = []
+
+    def collect_coordinates(value):
+        if (
+            isinstance(value, list)
+            and len(value) >= 2
+            and isinstance(value[0], (int, float))
+            and isinstance(value[1], (int, float))
+        ):
+            coordinate_pairs.append(value[:2])
+        elif isinstance(value, list):
+            for item in value:
+                collect_coordinates(item)
+
+    collect_coordinates(geometry["coordinates"])
+
+    longitudes = [point[0] for point in coordinate_pairs]
+    latitudes = [point[1] for point in coordinate_pairs]
+
+    return {
+        "longitude": sum(longitudes) / len(longitudes),
+        "latitude": sum(latitudes) / len(latitudes),
+    }
     
 def normalize_building_type_field(
     shp_path,
@@ -807,6 +866,51 @@ try:
         st.caption(
             f"Neighbourhood ID: "
             f"{selected_neighbourhood.get('id', 'Unknown')}"
+        )
+                neighbourhood_geometry = (
+            load_amsterdam_neighbourhood_geometry(
+                selected_neighbourhood["id"]
+            )
+        )
+
+        neighbourhood_center = get_geometry_center(
+            neighbourhood_geometry
+        )
+
+        neighbourhood_feature = {
+            "type": "Feature",
+            "properties": {
+                "name": selected_neighbourhood_name
+            },
+            "geometry": neighbourhood_geometry,
+        }
+
+        neighbourhood_layer = pdk.Layer(
+            "GeoJsonLayer",
+            neighbourhood_feature,
+            pickable=True,
+            stroked=True,
+            filled=True,
+            get_fill_color=[70, 130, 180, 80],
+            get_line_color=[30, 30, 30],
+            line_width_min_pixels=2,
+        )
+
+        neighbourhood_map = pdk.Deck(
+            layers=[neighbourhood_layer],
+            initial_view_state=pdk.ViewState(
+                latitude=neighbourhood_center["latitude"],
+                longitude=neighbourhood_center["longitude"],
+                zoom=13,
+            ),
+            tooltip={
+                "text": "{name}"
+            },
+        )
+
+        st.pydeck_chart(
+            neighbourhood_map,
+            use_container_width=True,
         )
 
 except Exception as exc:

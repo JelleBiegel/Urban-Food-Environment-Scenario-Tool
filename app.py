@@ -197,7 +197,7 @@ def get_value_counts(shp_path, field_name):
         return counts
 
 AMSTERDAM_NEIGHBOURHOODS_URL = (
-    "https://api.data.amsterdam.nl/v1/gebieden/buurten/"
+    "https://api.data.amsterdam.nl/v1/gebieden/wijken/"
 )
 
 
@@ -227,7 +227,7 @@ def load_amsterdam_neighbourhoods():
         response.raise_for_status()
         data = response.json()
 
-        records = data.get("_embedded", {}).get("buurten", [])
+        records = data.get("_embedded", {}).get("wijken", [])
 
         for record in records:
             neighbourhoods.append(

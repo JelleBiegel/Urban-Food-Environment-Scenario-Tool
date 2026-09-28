@@ -1324,53 +1324,53 @@ try:
             selection_mode="single-object",
             key="amsterdam_scenario_map",
         )
-selected_object = None
-selected_layer = None
-
-if map_event and map_event.selection:
-    selected_objects = map_event.selection.get(
-        "objects",
-        {}
-    )
-
-    for layer_id in ["food-outlets", "schools"]:
-        objects = selected_objects.get(
-            layer_id,
-            []
-        )
-
-        if objects:
-            selected_object = objects[0]
-            selected_layer = layer_id
-            break
-
-
-if selected_object:
-    st.subheader("Selected location")
-
-    st.write(
-        "**Name:**",
-        selected_object.get(
-            "name",
-            "Unnamed location",
-        ),
-    )
-
-    st.write(
-        "**Current model category:**",
-        selected_object.get(
-            "gama_type",
-            "Unknown",
-        ),
-    )
-
-    st.write(
-        "**Source:**",
-        selected_object.get(
-            "source",
-            "Unknown",
-        ),
-    )
+        selected_object = None
+        selected_layer = None
+        
+        if map_event and map_event.selection:
+            selected_objects = map_event.selection.get(
+                "objects",
+                {}
+            )
+        
+            for layer_id in ["food-outlets", "schools"]:
+                objects = selected_objects.get(
+                    layer_id,
+                    []
+                )
+        
+                if objects:
+                    selected_object = objects[0]
+                    selected_layer = layer_id
+                    break
+        
+        
+        if selected_object:
+            st.subheader("Selected location")
+        
+            st.write(
+                "**Name:**",
+                selected_object.get(
+                    "name",
+                    "Unnamed location",
+                ),
+            )
+        
+            st.write(
+                "**Current model category:**",
+                selected_object.get(
+                    "gama_type",
+                    "Unknown",
+                ),
+            )
+        
+            st.write(
+                "**Source:**",
+                selected_object.get(
+                    "source",
+                    "Unknown",
+                ),
+            )
 
 except Exception as exc:
     st.error(

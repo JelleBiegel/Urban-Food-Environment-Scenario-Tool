@@ -268,7 +268,7 @@ def load_amsterdam_neighbourhood_geometry(neighbourhood_id):
     response.raise_for_status()
     data = response.json()
 
-    records = data.get("_embedded", {}).get("buurten", [])
+    records = data.get("_embedded", {}).get("wijken", [])
 
     if not records:
         raise ValueError(

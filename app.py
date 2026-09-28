@@ -941,12 +941,12 @@ try:
             f"Neighbourhood ID: "
             f"{selected_neighbourhood.get('id', 'Unknown')}"
         )
-                neighbourhood_geometry = (
+        neighbourhood_geometry = (
             load_amsterdam_neighbourhood_geometry(
                 selected_neighbourhood["id"]
             )
         )
-                neighbourhood_buildings = (
+        neighbourhood_buildings = (
             load_amsterdam_buildings(
                 neighbourhood_geometry
             )

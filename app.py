@@ -641,7 +641,7 @@ def load_osm_food_environment(
             }
         )
 
-       pois = deduplicate_osm_pois(pois)
+    pois = deduplicate_osm_pois(pois)
 
     with open(
         cache_file,

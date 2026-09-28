@@ -1102,7 +1102,7 @@ try:
                 neighbourhood_geometry
             )
         )
-                osm_pois = load_osm_food_environment(
+        osm_pois = load_osm_food_environment(
             neighbourhood_geometry
         )
 

@@ -1248,7 +1248,8 @@ try:
         buildings_layer = pdk.Layer(
             "GeoJsonLayer",
             neighbourhood_buildings,
-            pickable=True,
+            id="buildings",
+            pickable=False,
             stroked=True,
             filled=True,
             get_fill_color=[210, 210, 210, 180],
@@ -1258,7 +1259,8 @@ try:
         neighbourhood_layer = pdk.Layer(
             "GeoJsonLayer",
             neighbourhood_feature,
-            pickable=True,
+            id="neighbourhood",
+            pickable=False,
             stroked=True,
             filled=True,
             get_fill_color=[70, 130, 180, 80],
@@ -1315,10 +1317,60 @@ try:
             },
         )
 
-        st.pydeck_chart(
+        map_event = st.pydeck_chart(
             neighbourhood_map,
             use_container_width=True,
+            on_select="rerun",
+            selection_mode="single-object",
+            key="amsterdam_scenario_map",
         )
+selected_object = None
+selected_layer = None
+
+if map_event and map_event.selection:
+    selected_objects = map_event.selection.get(
+        "objects",
+        {}
+    )
+
+    for layer_id in ["food-outlets", "schools"]:
+        objects = selected_objects.get(
+            layer_id,
+            []
+        )
+
+        if objects:
+            selected_object = objects[0]
+            selected_layer = layer_id
+            break
+
+
+if selected_object:
+    st.subheader("Selected location")
+
+    st.write(
+        "**Name:**",
+        selected_object.get(
+            "name",
+            "Unnamed location",
+        ),
+    )
+
+    st.write(
+        "**Current model category:**",
+        selected_object.get(
+            "gama_type",
+            "Unknown",
+        ),
+    )
+
+    st.write(
+        "**Source:**",
+        selected_object.get(
+            "source",
+            "Unknown",
+        ),
+    )
 
 except Exception as exc:
     st.error(

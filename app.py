@@ -1187,7 +1187,7 @@ try:
             get_line_color=[30, 30, 30],
             line_width_min_pixels=2,
         )
-                food_outlets_layer = pdk.Layer(
+        food_outlets_layer = pdk.Layer(
             "ScatterplotLayer",
             data=food_outlet_pois,
             id="food-outlets",

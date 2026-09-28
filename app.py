@@ -18,7 +18,8 @@ from pyproj import CRS
 
 import requests
 import pydeck as pdk
-from shapely.geometry import shape
+from shapely.geometry import Point, shape
+
 
 # ---------------------------------------------------------------------
 # CONFIGURATION
@@ -378,6 +379,156 @@ def load_amsterdam_buildings(neighbourhood_geometry):
         "type": "FeatureCollection",
         "features": selected_features,
     }
+    OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+
+
+def classify_osm_poi(tags):
+    """Translate OpenStreetMap tags to GAMA categories."""
+
+    amenity = tags.get("amenity", "")
+    shop = tags.get("shop", "")
+    cuisine = tags.get("cuisine", "").lower()
+    butcher_type = tags.get("butcher", "").lower()
+
+    # Schools
+    if amenity == "school":
+        return "School"
+
+    # Food service
+    if amenity == "fast_food":
+        return "Fastfood"
+
+    if amenity == "restaurant":
+        if "pancake" in cuisine:
+            return "Pancake restaurant"
+
+        return "Restaurant"
+
+    if amenity in {"cafe", "bar", "pub"}:
+        return "Café"
+
+    if amenity == "ice_cream":
+        return "Ice cream shop"
+
+    if amenity == "fuel":
+        return "Gas station"
+
+    # Shops
+    shop_mapping = {
+        "supermarket": "Supermarket",
+        "convenience": "Mini mart",
+        "bakery": "Bakery",
+        "cheese": "Cheese store",
+        "chocolate": "Chocolate shop",
+        "confectionery": "Sweet shop",
+        "alcohol": "Liquor store",
+        "wine": "Liquor store",
+        "tobacco": "Tobacconist",
+        "pastry": "Pastry shop",
+        "deli": "Delicacies shop",
+        "health_food": "Reform/bio shop",
+        "nuts": "Nut shop",
+        "seafood": "Fish store",
+        "greengrocer": "Vegetable store",
+        "coffee": "Coffee/tea shop",
+        "tea": "Coffee/tea shop",
+        "chemist": "Drug store",
+    }
+
+    if shop == "butcher":
+        if "poultry" in butcher_type:
+            return "Poulterer"
+
+        return "Butcher"
+
+    return shop_mapping.get(shop)
+
+
+@st.cache_data(ttl=3600)
+def load_osm_food_environment(neighbourhood_geometry):
+    """Load schools and food outlets from OpenStreetMap."""
+
+    neighbourhood_shape = shape(
+        neighbourhood_geometry
+    )
+
+    min_lon, min_lat, max_lon, max_lat = (
+        get_geometry_bounds(
+            neighbourhood_geometry
+        )
+    )
+
+    # Overpass uses south, west, north, east
+    bbox = (
+        f"{min_lat},{min_lon},"
+        f"{max_lat},{max_lon}"
+    )
+
+    query = f"""
+    [out:json][timeout:60];
+    (
+      nwr["amenity"~"^(school|restaurant|fast_food|cafe|ice_cream|pub|bar|fuel)$"]({bbox});
+      nwr["shop"~"^(supermarket|convenience|bakery|butcher|cheese|chocolate|confectionery|alcohol|wine|tobacco|pastry|deli|health_food|nuts|seafood|greengrocer|coffee|tea|chemist)$"]({bbox});
+    );
+    out center;
+    """
+
+    response = requests.post(
+        OVERPASS_URL,
+        data={"data": query},
+        timeout=90,
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    pois = []
+
+    for element in data.get("elements", []):
+        tags = element.get("tags", {})
+
+        gama_type = classify_osm_poi(tags)
+
+        if gama_type is None:
+            continue
+
+        if element["type"] == "node":
+            latitude = element.get("lat")
+            longitude = element.get("lon")
+
+        else:
+            center = element.get("center", {})
+            latitude = center.get("lat")
+            longitude = center.get("lon")
+
+        if latitude is None or longitude is None:
+            continue
+
+        point = Point(
+            longitude,
+            latitude,
+        )
+
+        if not neighbourhood_shape.covers(point):
+            continue
+
+        pois.append(
+            {
+                "osm_id": str(element.get("id")),
+                "osm_type": element.get("type"),
+                "name": tags.get(
+                    "name",
+                    "Unnamed location",
+                ),
+                "gama_type": gama_type,
+                "latitude": latitude,
+                "longitude": longitude,
+                "source": "OpenStreetMap",
+            }
+        )
+
+    return pois
 def normalize_building_type_field(
     shp_path,
     selected_field,
@@ -950,6 +1101,26 @@ try:
             load_amsterdam_buildings(
                 neighbourhood_geometry
             )
+        )
+                osm_pois = load_osm_food_environment(
+            neighbourhood_geometry
+        )
+
+        school_pois = [
+            poi
+            for poi in osm_pois
+            if poi["gama_type"] == "School"
+        ]
+
+        food_outlet_pois = [
+            poi
+            for poi in osm_pois
+            if poi["gama_type"] != "School"
+        ]
+
+        st.caption(
+            f"{len(school_pois)} schools and "
+            f"{len(food_outlet_pois)} food outlets loaded from OpenStreetMap."
         )
 
         st.caption(

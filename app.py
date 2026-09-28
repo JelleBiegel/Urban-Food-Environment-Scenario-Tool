@@ -1147,6 +1147,9 @@ if "scenario_results" not in st.session_state:
 if "amsterdam_poi_edits" not in st.session_state:
     st.session_state.amsterdam_poi_edits = {}
 
+if "selected_amsterdam_poi" not in st.session_state:
+    st.session_state.selected_amsterdam_poi = None
+
 # ---------------------------------------------------------------------
 # 1. STUDY AREA
 # ---------------------------------------------------------------------
@@ -1359,8 +1362,9 @@ try:
             selection_mode="single-object",
             key="amsterdam_scenario_map",
         )
-        selected_object = None
-        selected_layer = None
+                # ---------------------------------------------------------------
+        # MAP SELECTION
+        # ---------------------------------------------------------------
         
         if map_event and map_event.selection:
             selected_objects = map_event.selection.get(
@@ -1375,10 +1379,53 @@ try:
                 )
         
                 if objects:
-                    selected_object = objects[0]
-                    selected_layer = layer_id
+                    clicked_object = objects[0]
+        
+                    st.session_state.selected_amsterdam_poi = {
+                        "osm_id": clicked_object.get("osm_id"),
+                        "layer": layer_id,
+                    }
+        
                     break
         
+        
+        # ---------------------------------------------------------------
+        # FIND THE CURRENT VERSION OF THE SELECTED OBJECT
+        # ---------------------------------------------------------------
+        
+        selected_object = None
+        selected_layer = None
+        
+        saved_selection = st.session_state.selected_amsterdam_poi
+        
+        if saved_selection:
+            selected_layer = saved_selection["layer"]
+            selected_id = saved_selection["osm_id"]
+        
+            if selected_layer == "food-outlets":
+                selected_object = next(
+                    (
+                        poi
+                        for poi in food_outlet_pois
+                        if poi["osm_id"] == selected_id
+                    ),
+                    None,
+                )
+        
+            elif selected_layer == "schools":
+                selected_object = next(
+                    (
+                        poi
+                        for poi in school_pois
+                        if poi["osm_id"] == selected_id
+                    ),
+                    None,
+                )
+        
+        
+        # ---------------------------------------------------------------
+        # EDITOR
+        # ---------------------------------------------------------------
         
         if selected_object:
             st.subheader("Selected location")
@@ -1455,6 +1502,8 @@ try:
                             edit_key
                         ] = "__REMOVE__"
         
+                        st.session_state.selected_amsterdam_poi = None
+        
                         st.rerun()
         
                 with edit_col3:
@@ -1470,10 +1519,10 @@ try:
         
                         st.rerun()
         
-            elif selected_layer == "schools":
-                st.info(
-                    "Schools are currently fixed and cannot be edited."
-                )
+        elif saved_selection:
+            st.info(
+                "The selected location is no longer part of this scenario."
+            )
 
 except Exception as exc:
     st.error(

@@ -903,6 +903,7 @@ try:
                 longitude=neighbourhood_center["longitude"],
                 zoom=13,
             ),
+            map_style="light",
             tooltip={
                 "text": "{name}"
             },

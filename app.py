@@ -1187,11 +1187,41 @@ try:
             get_line_color=[30, 30, 30],
             line_width_min_pixels=2,
         )
+                food_outlets_layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=food_outlet_pois,
+            id="food-outlets",
+            get_position="[longitude, latitude]",
+            get_fill_color=[217, 119, 87, 230],
+            get_line_color=[120, 60, 40],
+            get_radius=10,
+            radius_min_pixels=5,
+            stroked=True,
+            pickable=True,
+            auto_highlight=True,
+        )
 
-        neighbourhood_map = pdk.Deck(
-            layers=[buildings_layer,
-                    neighbourhood_layer
-            ],
+        schools_layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=school_pois,
+            id="schools",
+            get_position="[longitude, latitude]",
+            get_fill_color=[65, 105, 225, 230],
+            get_line_color=[30, 50, 120],
+            get_radius=12,
+            radius_min_pixels=6,
+            stroked=True,
+            pickable=True,
+            auto_highlight=True,
+        )
+
+            neighbourhood_map = pdk.Deck(
+                layers=[
+                    buildings_layer,
+                    neighbourhood_layer,
+                    food_outlets_layer,
+                    schools_layer,
+                ],
             initial_view_state=pdk.ViewState(
                 latitude=neighbourhood_center["latitude"],
                 longitude=neighbourhood_center["longitude"],
@@ -1199,7 +1229,11 @@ try:
             ),
             map_style="light",
             tooltip={
-                "text": "{name}"
+                "html": (
+                    "<b>{name}</b><br/>"
+                    "{gama_type}<br/>"
+                    "<small>{source}</small>"
+                )
             },
         )
 

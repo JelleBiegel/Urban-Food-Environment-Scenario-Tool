@@ -499,7 +499,7 @@ def load_osm_food_environment(neighbourhood_geometry):
     )
 
     query = f"""
-    [out:json][timeout:60];
+    [out:json][timeout:25];
     (
       nwr["amenity"~"^(school|restaurant|fast_food|cafe|ice_cream|pub|bar|fuel)$"]({bbox});
       nwr["shop"~"^(supermarket|convenience|bakery|butcher|cheese|chocolate|confectionery|alcohol|wine|tobacco|pastry|deli|health_food|nuts|seafood|greengrocer|coffee|tea|chemist)$"]({bbox});
@@ -1130,26 +1130,38 @@ try:
                 neighbourhood_geometry
             )
         )
-        osm_pois = load_osm_food_environment(
-            neighbourhood_geometry
-        )
+        osm_pois = []
+        school_pois = []
+        food_outlet_pois = []
 
-        school_pois = [
-            poi
-            for poi in osm_pois
-            if poi["gama_type"] == "School"
-        ]
+        try:
+            osm_pois = load_osm_food_environment(
+                neighbourhood_geometry
+            )
 
-        food_outlet_pois = [
-            poi
-            for poi in osm_pois
-            if poi["gama_type"] != "School"
-        ]
+            school_pois = [
+                poi
+                for poi in osm_pois
+                if poi["gama_type"] == "School"
+            ]
 
-        st.caption(
-            f"{len(school_pois)} schools and "
-            f"{len(food_outlet_pois)} food outlets loaded from OpenStreetMap."
-        )
+            food_outlet_pois = [
+                poi
+                for poi in osm_pois
+                if poi["gama_type"] != "School"
+            ]
+
+            st.caption(
+                f"{len(school_pois)} schools and "
+                f"{len(food_outlet_pois)} food outlets loaded from OpenStreetMap."
+            )
+
+        except Exception:
+            st.warning(
+                "OpenStreetMap data could not be loaded right now. "
+                "The neighbourhood and building data are still available. "
+                "Refresh the page to retry."
+            )
 
         st.caption(
             f"{len(neighbourhood_buildings['features'])} "

@@ -1215,13 +1215,13 @@ try:
             auto_highlight=True,
         )
 
-            neighbourhood_map = pdk.Deck(
-                layers=[
-                    buildings_layer,
-                    neighbourhood_layer,
-                    food_outlets_layer,
-                    schools_layer,
-                ],
+        neighbourhood_map = pdk.Deck(
+            layers=[
+                buildings_layer,
+                neighbourhood_layer,
+                food_outlets_layer,
+                schools_layer,
+            ],
             initial_view_state=pdk.ViewState(
                 latitude=neighbourhood_center["latitude"],
                 longitude=neighbourhood_center["longitude"],

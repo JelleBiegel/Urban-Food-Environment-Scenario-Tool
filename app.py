@@ -379,8 +379,11 @@ def load_amsterdam_buildings(neighbourhood_geometry):
         "type": "FeatureCollection",
         "features": selected_features,
     }
-OVERPASS_URL = "https://overpass.private.coffee/api/interpreter"
-
+OVERPASS_URLS = [
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+    "https://overpass-api.de/api/interpreter",
+]
 
 def classify_osm_poi(tags):
     """Translate OpenStreetMap tags to GAMA categories."""
@@ -443,7 +446,38 @@ def classify_osm_poi(tags):
 
     return shop_mapping.get(shop)
 
+def run_overpass_query(query):
+    """Try multiple public Overpass servers until one responds."""
 
+    errors = []
+
+    for url in OVERPASS_URLS:
+        try:
+            response = requests.post(
+                url,
+                data={"data": query},
+                headers={
+                    "User-Agent": (
+                        "Urban-Food-Environment-Scenario-Tool/1.0"
+                    ),
+                    "Accept": "application/json",
+                },
+                timeout=45,
+            )
+
+            response.raise_for_status()
+
+            return response.json()
+
+        except requests.RequestException as exc:
+            errors.append(
+                f"{url}: {exc}"
+            )
+
+    raise RuntimeError(
+        "OpenStreetMap data could not be retrieved from "
+        "any available Overpass server."
+    )
 @st.cache_data(ttl=3600)
 def load_osm_food_environment(neighbourhood_geometry):
     """Load schools and food outlets from OpenStreetMap."""
@@ -470,20 +504,10 @@ def load_osm_food_environment(neighbourhood_geometry):
       nwr["amenity"~"^(school|restaurant|fast_food|cafe|ice_cream|pub|bar|fuel)$"]({bbox});
       nwr["shop"~"^(supermarket|convenience|bakery|butcher|cheese|chocolate|confectionery|alcohol|wine|tobacco|pastry|deli|health_food|nuts|seafood|greengrocer|coffee|tea|chemist)$"]({bbox});
     );
-    out center;
+    out center qt;
     """
 
-    response = requests.post(
-    OVERPASS_URL,
-    data={"data": query},
-    headers={
-        "User-Agent": "Urban-Food-Environment-Scenario-Tool/1.0",
-        "Accept": "application/json",
-    },
-    timeout=90,
-    )
-
-    response.raise_for_status()
+    data = run_overpass_query(query)
 
     data = response.json()
 

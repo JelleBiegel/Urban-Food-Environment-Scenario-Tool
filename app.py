@@ -18,7 +18,7 @@ from pyproj import CRS
 
 import requests
 import pydeck as pdk
-from shapely.geometry import Point, shape
+from shapely.geometry import shape
 
 import math
 
@@ -32,8 +32,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 RUNTIME_DIR = PROJECT_ROOT / ".runtime"
 RUNTIME_DIR.mkdir(exist_ok=True)
 
-OSM_CACHE_DIR = RUNTIME_DIR / "osm_cache"
-OSM_CACHE_DIR.mkdir(exist_ok=True)
+LOCAL_OSM_FILE = (
+    PROJECT_ROOT
+    / "Data"
+    / "osm"
+    / "noord_holland_food_environment.geojson"
+)
 
 MODEL = Path(
     os.getenv(
@@ -384,19 +388,15 @@ def load_amsterdam_buildings(neighbourhood_geometry):
         "type": "FeatureCollection",
         "features": selected_features,
     }
-OVERPASS_URLS = [
-    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-    "https://overpass.private.coffee/api/interpreter",
-    "https://overpass-api.de/api/interpreter",
-]
+
 
 def classify_osm_poi(tags):
     """Translate OpenStreetMap tags to GAMA categories."""
 
-    amenity = tags.get("amenity", "")
-    shop = tags.get("shop", "")
-    cuisine = tags.get("cuisine", "").lower()
-    butcher_type = tags.get("butcher", "").lower()
+    amenity = str(tags.get("amenity", "") or "")
+    shop = str(tags.get("shop", "") or "")
+    cuisine = str(tags.get("cuisine", "") or "").lower()
+    butcher_type = str(tags.get("butcher", "") or "").lower()
 
     # Schools
     if amenity == "school":
@@ -421,7 +421,7 @@ def classify_osm_poi(tags):
     if amenity == "fuel":
         return "Gas station"
 
-    # Shops
+    # Food retail
     shop_mapping = {
         "supermarket": "Supermarket",
         "convenience": "Mini mart",
@@ -451,59 +451,28 @@ def classify_osm_poi(tags):
 
     return shop_mapping.get(shop)
 
-def run_overpass_query(query):
-    """Try multiple public Overpass servers until one responds."""
 
-    errors = []
-
-    for url in OVERPASS_URLS:
-        try:
-            response = requests.post(
-                url,
-                data={"data": query},
-                headers={
-                    "User-Agent": (
-                        "Urban-Food-Environment-Scenario-Tool/1.0"
-                    ),
-                    "Accept": "application/json",
-                },
-                timeout=45,
-            )
-
-            response.raise_for_status()
-
-            return response.json()
-
-        except requests.RequestException as exc:
-            errors.append(
-                f"{url}: {exc}"
-            )
-
-    raise RuntimeError(
-        "OpenStreetMap data could not be retrieved from "
-        "any available Overpass server."
-    )
 def distance_metres(lat1, lon1, lat2, lon2):
-     """Approximate distance between two WGS84 coordinates."""
-    
+    """Approximate distance between two WGS84 coordinates."""
+
     earth_radius = 6371000
-    
+
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
-    
+
     delta_phi = math.radians(lat2 - lat1)
     delta_lambda = math.radians(lon2 - lon1)
-    
+
     a = (
         math.sin(delta_phi / 2) ** 2
         + math.cos(phi1)
         * math.cos(phi2)
         * math.sin(delta_lambda / 2) ** 2
     )
-    
+
     return earth_radius * 2 * math.atan2(
-            math.sqrt(a),
-            math.sqrt(1 - a),
+        math.sqrt(a),
+        math.sqrt(1 - a),
     )
 
 
@@ -537,8 +506,8 @@ def deduplicate_osm_pois(pois):
                 existing["longitude"],
             )
 
-            # OSM may represent the same school/outlet as both
-            # a point and a polygon.
+            # OSM can represent the same school or outlet as both
+            # a point and a polygon/relation.
             if distance <= 60:
                 duplicate = True
                 break
@@ -547,116 +516,103 @@ def deduplicate_osm_pois(pois):
             unique_pois.append(poi)
 
     return unique_pois
-    
+
+
+@st.cache_data(show_spinner=False)
 def load_osm_food_environment(
     neighbourhood_geometry,
-    neighbourhood_id,
-    force_refresh=False,
+    osm_file_mtime_ns,
 ):
-    """Load schools and food outlets from OpenStreetMap."""
-    cache_file = (
-        OSM_CACHE_DIR
-        / f"{neighbourhood_id}_osm.json"
-    )
+    """
+    Load schools and food outlets from the local OpenStreetMap GeoJSON
+    and retain only locations inside the selected Amsterdam wijk.
+    """
 
-    if cache_file.exists() and not force_refresh:
-        with open(
-            cache_file,
-            "r",
-            encoding="utf-8",
-        ) as file:
-            return json.load(file)
+    if not LOCAL_OSM_FILE.exists():
+        raise FileNotFoundError(
+            "Local OpenStreetMap file not found at "
+            f"{LOCAL_OSM_FILE}."
+        )
+
+    # osm_file_mtime_ns is intentionally part of the function signature.
+    # It makes Streamlit invalidate this cache automatically when the
+    # local GeoJSON file is replaced with a newer extract.
+    _ = osm_file_mtime_ns
+
+    with open(
+        LOCAL_OSM_FILE,
+        "r",
+        encoding="utf-8",
+    ) as file:
+        osm_data = json.load(file)
 
     neighbourhood_shape = shape(
         neighbourhood_geometry
     )
 
-    min_lon, min_lat, max_lon, max_lat = (
-        get_geometry_bounds(
-            neighbourhood_geometry
-        )
-    )
-
-    # Overpass uses south, west, north, east
-    bbox = (
-        f"{min_lat},{min_lon},"
-        f"{max_lat},{max_lon}"
-    )
-
-    query = f"""
-    [out:json][timeout:25];
-    (
-      nwr["amenity"~"^(school|restaurant|fast_food|cafe|ice_cream|pub|bar|fuel)$"]({bbox});
-      nwr["shop"~"^(supermarket|convenience|bakery|butcher|cheese|chocolate|confectionery|alcohol|wine|tobacco|pastry|deli|health_food|nuts|seafood|greengrocer|coffee|tea|chemist)$"]({bbox});
-    );
-    out center qt;
-    """
-
-    data = run_overpass_query(query)
-
-
-
     pois = []
 
-    for element in data.get("elements", []):
-        tags = element.get("tags", {})
+    for feature in osm_data.get("features", []):
+        geometry = feature.get("geometry")
+        properties = feature.get("properties", {}) or {}
 
-        gama_type = classify_osm_poi(tags)
+        if geometry is None:
+            continue
+
+        gama_type = classify_osm_poi(
+            properties
+        )
 
         if gama_type is None:
             continue
 
-        if element["type"] == "node":
-            latitude = element.get("lat")
-            longitude = element.get("lon")
-
-        else:
-            center = element.get("center", {})
-            latitude = center.get("lat")
-            longitude = center.get("lon")
-
-        if latitude is None or longitude is None:
+        try:
+            osm_geometry = shape(
+                geometry
+            )
+        except Exception:
             continue
 
-        point = Point(
-            longitude,
-            latitude,
-        )
+        if osm_geometry.is_empty:
+            continue
+
+        if osm_geometry.geom_type == "Point":
+            point = osm_geometry
+        else:
+            point = osm_geometry.representative_point()
 
         if not neighbourhood_shape.covers(point):
             continue
 
+        osm_identifier = (
+            properties.get("@id")
+            or properties.get("id")
+            or feature.get("id")
+            or ""
+        )
+
         pois.append(
             {
-                "osm_id": str(element.get("id")),
-                "osm_type": element.get("type"),
-                "name": tags.get(
-                    "name",
-                    "Unnamed location",
+                "osm_id": str(osm_identifier),
+                "name": str(
+                    properties.get(
+                        "name",
+                        "Unnamed location",
+                    )
+                    or "Unnamed location"
                 ),
                 "gama_type": gama_type,
-                "latitude": latitude,
-                "longitude": longitude,
+                "latitude": float(point.y),
+                "longitude": float(point.x),
                 "source": "OpenStreetMap",
             }
         )
 
-    pois = deduplicate_osm_pois(pois)
+    return deduplicate_osm_pois(
+        pois
+    )
 
-    with open(
-        cache_file,
-        "w",
-        encoding="utf-8",
-    ) as file:
-        json.dump(
-            pois,
-            file,
-            ensure_ascii=False,
-            indent=2,
-        )
 
-    return pois
-    
 def normalize_building_type_field(
     shp_path,
     selected_field,
@@ -1235,9 +1191,14 @@ try:
         food_outlet_pois = []
 
         try:
+            if not LOCAL_OSM_FILE.exists():
+                raise FileNotFoundError(
+                    f"Expected file: {LOCAL_OSM_FILE}"
+                )
+
             osm_pois = load_osm_food_environment(
                 neighbourhood_geometry,
-                selected_neighbourhood["id"],
+                LOCAL_OSM_FILE.stat().st_mtime_ns,
             )
 
             school_pois = [
@@ -1252,16 +1213,20 @@ try:
                 if poi["gama_type"] != "School"
             ]
 
-            st.caption(
+            st.success(
                 f"{len(school_pois)} schools and "
-                f"{len(food_outlet_pois)} food outlets loaded from OpenStreetMap."
+                f"{len(food_outlet_pois)} food outlets loaded."
             )
 
-        except Exception:
+            st.caption(
+                "Food-environment data loaded from the local "
+                "OpenStreetMap dataset."
+            )
+
+        except Exception as osm_error:
             st.warning(
-                "OpenStreetMap data could not be loaded right now. "
-                "The neighbourhood and building data are still available. "
-                "Refresh the page to retry."
+                "The local OpenStreetMap food-environment data "
+                f"could not be loaded: {osm_error}"
             )
 
         st.caption(
@@ -1357,7 +1322,7 @@ try:
 
 except Exception as exc:
     st.error(
-        f"Could not load Amsterdam neighbourhoods: {exc}"
+        f"Could not load Amsterdam study-area data: {exc}"
     )
 
 st.caption(

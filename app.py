@@ -474,9 +474,13 @@ def load_osm_food_environment(neighbourhood_geometry):
     """
 
     response = requests.post(
-        OVERPASS_URL,
-        data={"data": query},
-        timeout=90,
+    OVERPASS_URL,
+    data={"data": query},
+    headers={
+        "User-Agent": "Urban-Food-Environment-Scenario-Tool/1.0",
+        "Accept": "application/json",
+    },
+    timeout=90,
     )
 
     response.raise_for_status()

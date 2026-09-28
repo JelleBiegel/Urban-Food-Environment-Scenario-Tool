@@ -96,7 +96,15 @@ GAMA_TYPES = [
     "Fish store",
     "Vegetable store",
 ]
-
+FOOD_OUTLET_TYPES = [
+    category
+    for category in GAMA_TYPES
+    if category not in {
+        "Nature",
+        "Residential",
+        "School",
+    }
+]
 
 # ---------------------------------------------------------------------
 # SHAPEFILE HELPERS
@@ -1135,7 +1143,9 @@ st.write(
 
 if "scenario_results" not in st.session_state:
     st.session_state.scenario_results = []
-
+    
+if "amsterdam_poi_edits" not in st.session_state:
+    st.session_state.amsterdam_poi_edits = {}
 
 # ---------------------------------------------------------------------
 # 1. STUDY AREA
@@ -1189,6 +1199,31 @@ try:
         osm_pois = []
         school_pois = []
         food_outlet_pois = []
+        edited_food_outlets = []
+
+        for poi in food_outlet_pois:
+            edit_key = (
+                f"{selected_neighbourhood['id']}::"
+                f"{poi['osm_id']}"
+            )
+        
+            edited_poi = poi.copy()
+        
+            saved_edit = st.session_state.amsterdam_poi_edits.get(
+                edit_key
+            )
+        
+            if saved_edit == "__REMOVE__":
+                continue
+        
+            if saved_edit:
+                edited_poi["gama_type"] = saved_edit
+        
+            edited_food_outlets.append(
+                edited_poi
+            )
+        
+        food_outlet_pois = edited_food_outlets
 
         try:
             if not LOCAL_OSM_FILE.exists():
@@ -1348,20 +1383,24 @@ try:
         if selected_object:
             st.subheader("Selected location")
         
+            location_name = selected_object.get(
+                "name",
+                "Unnamed location",
+            )
+        
+            current_type = selected_object.get(
+                "gama_type",
+                "Unknown",
+            )
+        
             st.write(
                 "**Name:**",
-                selected_object.get(
-                    "name",
-                    "Unnamed location",
-                ),
+                location_name,
             )
         
             st.write(
                 "**Current model category:**",
-                selected_object.get(
-                    "gama_type",
-                    "Unknown",
-                ),
+                current_type,
             )
         
             st.write(
@@ -1371,6 +1410,70 @@ try:
                     "Unknown",
                 ),
             )
+        
+            if selected_layer == "food-outlets":
+                edit_key = (
+                    f"{selected_neighbourhood['id']}::"
+                    f"{selected_object['osm_id']}"
+                )
+        
+                if current_type in FOOD_OUTLET_TYPES:
+                    default_index = FOOD_OUTLET_TYPES.index(
+                        current_type
+                    )
+                else:
+                    default_index = 0
+        
+                new_type = st.selectbox(
+                    "Change food outlet category",
+                    FOOD_OUTLET_TYPES,
+                    index=default_index,
+                    key=f"category_{edit_key}",
+                )
+        
+                edit_col1, edit_col2, edit_col3 = st.columns(3)
+        
+                with edit_col1:
+                    if st.button(
+                        "Apply change",
+                        key=f"apply_{edit_key}",
+                        use_container_width=True,
+                    ):
+                        st.session_state.amsterdam_poi_edits[
+                            edit_key
+                        ] = new_type
+        
+                        st.rerun()
+        
+                with edit_col2:
+                    if st.button(
+                        "Remove outlet",
+                        key=f"remove_{edit_key}",
+                        use_container_width=True,
+                    ):
+                        st.session_state.amsterdam_poi_edits[
+                            edit_key
+                        ] = "__REMOVE__"
+        
+                        st.rerun()
+        
+                with edit_col3:
+                    if st.button(
+                        "Reset",
+                        key=f"reset_{edit_key}",
+                        use_container_width=True,
+                    ):
+                        st.session_state.amsterdam_poi_edits.pop(
+                            edit_key,
+                            None,
+                        )
+        
+                        st.rerun()
+        
+            elif selected_layer == "schools":
+                st.info(
+                    "Schools are currently fixed and cannot be edited."
+                )
 
 except Exception as exc:
     st.error(

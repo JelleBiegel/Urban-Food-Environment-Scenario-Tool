@@ -201,15 +201,17 @@ AMSTERDAM_NEIGHBOURHOODS_URL = (
 
 @st.cache_data(ttl=86400)
 
+
 def load_amsterdam_neighbourhoods():
-    """Load all Amsterdam neighbourhoods from the official Amsterdam API."""
+    """Load Amsterdam neighbourhood names from the official Amsterdam API."""
 
     neighbourhoods = []
 
     url = AMSTERDAM_NEIGHBOURHOODS_URL
     params = {
-        "_pageSize": 500,
+        "_pageSize": 100,
         "_sort": "naam",
+        "_fields": "naam,identificatie",
     }
 
     while url:
@@ -217,10 +219,10 @@ def load_amsterdam_neighbourhoods():
             url,
             params=params,
             headers={"Accept": "application/hal+json"},
-            timeout=30,
+            timeout=60,
         )
-        response.raise_for_status()
 
+        response.raise_for_status()
         data = response.json()
 
         records = data.get("_embedded", {}).get("buurten", [])
@@ -229,9 +231,7 @@ def load_amsterdam_neighbourhoods():
             neighbourhoods.append(
                 {
                     "name": record.get("naam"),
-                    "code": record.get("code"),
                     "id": record.get("identificatie"),
-                    "geometry": record.get("geometrie"),
                 }
             )
 
@@ -805,8 +805,8 @@ try:
         )
 
         st.caption(
-            f"Neighbourhood code: "
-            f"{selected_neighbourhood.get('code', 'Unknown')}"
+            f"Neighbourhood ID: "
+            f"{selected_neighbourhood.get('id', 'Unknown')}"
         )
 
 except Exception as exc:

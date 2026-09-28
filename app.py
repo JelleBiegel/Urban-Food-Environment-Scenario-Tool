@@ -20,6 +20,8 @@ import requests
 import pydeck as pdk
 from shapely.geometry import Point, shape
 
+import math
+
 
 # ---------------------------------------------------------------------
 # CONFIGURATION
@@ -29,6 +31,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 RUNTIME_DIR = PROJECT_ROOT / ".runtime"
 RUNTIME_DIR.mkdir(exist_ok=True)
+
+OSM_CACHE_DIR = RUNTIME_DIR / "osm_cache"
+OSM_CACHE_DIR.mkdir(exist_ok=True)
 
 MODEL = Path(
     os.getenv(
@@ -478,9 +483,89 @@ def run_overpass_query(query):
         "OpenStreetMap data could not be retrieved from "
         "any available Overpass server."
     )
-@st.cache_data(ttl=3600)
-def load_osm_food_environment(neighbourhood_geometry):
+    def distance_metres(lat1, lon1, lat2, lon2):
+    """Approximate distance between two WGS84 coordinates."""
+
+    earth_radius = 6371000
+
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    a = (
+        math.sin(delta_phi / 2) ** 2
+        + math.cos(phi1)
+        * math.cos(phi2)
+        * math.sin(delta_lambda / 2) ** 2
+    )
+
+    return earth_radius * 2 * math.atan2(
+        math.sqrt(a),
+        math.sqrt(1 - a),
+    )
+
+
+def deduplicate_osm_pois(pois):
+    """Remove likely duplicate OSM locations."""
+
+    unique_pois = []
+
+    for poi in pois:
+        duplicate = False
+
+        for existing in unique_pois:
+            if poi["gama_type"] != existing["gama_type"]:
+                continue
+
+            poi_name = poi["name"].strip().lower()
+            existing_name = existing["name"].strip().lower()
+
+            # Named locations must have the same name.
+            if (
+                poi_name != "unnamed location"
+                and existing_name != "unnamed location"
+                and poi_name != existing_name
+            ):
+                continue
+
+            distance = distance_metres(
+                poi["latitude"],
+                poi["longitude"],
+                existing["latitude"],
+                existing["longitude"],
+            )
+
+            # OSM may represent the same school/outlet as both
+            # a point and a polygon.
+            if distance <= 60:
+                duplicate = True
+                break
+
+        if not duplicate:
+            unique_pois.append(poi)
+
+    return unique_pois
+    
+def load_osm_food_environment(
+    neighbourhood_geometry,
+    neighbourhood_id,
+    force_refresh=False,
+):
     """Load schools and food outlets from OpenStreetMap."""
+    cache_file = (
+        OSM_CACHE_DIR
+        / f"{neighbourhood_id}_osm.json"
+    )
+
+    if cache_file.exists() and not force_refresh:
+        with open(
+            cache_file,
+            "r",
+            encoding="utf-8",
+        ) as file:
+            return json.load(file)
 
     neighbourhood_shape = shape(
         neighbourhood_geometry
@@ -556,7 +641,22 @@ def load_osm_food_environment(neighbourhood_geometry):
             }
         )
 
+       pois = deduplicate_osm_pois(pois)
+
+    with open(
+        cache_file,
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            pois,
+            file,
+            ensure_ascii=False,
+            indent=2,
+        )
+
     return pois
+    
 def normalize_building_type_field(
     shp_path,
     selected_field,
@@ -1136,7 +1236,8 @@ try:
 
         try:
             osm_pois = load_osm_food_environment(
-                neighbourhood_geometry
+                neighbourhood_geometry,
+                selected_neighbourhood["id"],
             )
 
             school_pois = [

@@ -49,6 +49,7 @@ import streamlit as st
 
 
 import websockets
+from websockets.exceptions import ConnectionClosed
 
 
 
@@ -177,7 +178,7 @@ OUTPUT = Path(
 
 
 
-GAMA_URI = os.getenv("GAMA_URI", "ws://127.0.0.1:6868").strip()
+GAMA_URI = os.getenv("GAMA_URI", "ws://gama:6868").strip()
 
 
 
@@ -186,6 +187,18 @@ NUMBER_OF_RUNS = 5
 
 
 RUN_TIMEOUT_SECONDS = 180
+
+
+
+GAMA_CONNECT_RETRY_SECONDS = 30
+
+
+
+GAMA_CONNECT_RETRY_INTERVAL_SECONDS = 2
+
+
+
+GAMA_RUN_RETRY_LIMIT = 1
 
 
 
@@ -3378,7 +3391,221 @@ def plot_scenario_preview(
 
 
 
-async def run_gama(
+async def connect_to_gama_with_retry():
+
+
+
+    """Connect to the Codespaces GAMA service, retrying during restarts."""
+
+
+
+    loop = asyncio.get_running_loop()
+
+
+
+    deadline = loop.time() + GAMA_CONNECT_RETRY_SECONDS
+
+
+
+    last_error = None
+
+
+
+    attempt = 0
+
+
+
+    while True:
+
+
+
+        attempt += 1
+
+
+
+        websocket_context = None
+
+
+
+        try:
+
+
+
+            websocket_context = websockets.connect(
+
+
+
+                GAMA_URI,
+
+
+
+                open_timeout=5,
+
+
+
+            )
+
+
+
+            websocket = await websocket_context.__aenter__()
+
+
+
+            hello_raw = await asyncio.wait_for(
+
+
+
+                websocket.recv(),
+
+
+
+                timeout=10,
+
+
+
+            )
+
+
+
+            hello = json.loads(hello_raw)
+
+
+
+            if hello.get("type") != "ConnectionSuccessful":
+
+
+
+                raise RuntimeError(
+
+
+
+                    "GAMA returned an unexpected connection message: "
+
+
+
+                    f"{hello}"
+
+
+
+                )
+
+
+
+            return websocket_context, websocket
+
+
+
+        except Exception as exc:
+
+
+
+            last_error = exc
+
+
+
+            if websocket_context is not None:
+
+
+
+                try:
+
+
+
+                    await websocket_context.__aexit__(
+
+
+
+                        type(exc),
+
+
+
+                        exc,
+
+
+
+                        exc.__traceback__,
+
+
+
+                    )
+
+
+
+                except Exception:
+
+
+
+                    pass
+
+
+
+            remaining = deadline - loop.time()
+
+
+
+            if remaining <= 0:
+
+
+
+                raise RuntimeError(
+
+
+
+                    "Could not connect to the GAMA websocket server at "
+
+
+
+                    f"'{GAMA_URI}' after retrying for "
+
+
+
+                    f"{GAMA_CONNECT_RETRY_SECONDS} seconds. "
+
+
+
+                    "The Codespaces 'gama' service may still be restarting. "
+
+
+
+                    f"Last error: {type(last_error).__name__}: {last_error}"
+
+
+
+                ) from last_error
+
+
+
+            await asyncio.sleep(
+
+
+
+                min(
+
+
+
+                    GAMA_CONNECT_RETRY_INTERVAL_SECONDS,
+
+
+
+                    remaining,
+
+
+
+                )
+
+
+
+            )
+
+
+
+
+
+async def run_one_gama_simulation(
+
+
+
+    websocket,
 
 
 
@@ -3414,7 +3641,7 @@ async def run_gama(
 
 
 
-    """Run one GAMA simulation and return its CSV result row."""
+    """Run one experiment over an already-open GAMA websocket."""
 
 
 
@@ -3442,281 +3669,263 @@ async def run_gama(
 
 
 
-    # Connect to GAMA. The Streamlit app may run directly on the host,
-    # in Docker with GAMA in another container, or in Docker while GAMA runs
-    # natively on the host. Try the appropriate common addresses in order.
-    candidate_uris = [
-        GAMA_URI,
-        "ws://gama:6868",
-        "ws://host.docker.internal:6868",
-        "ws://127.0.0.1:6868",
-        "ws://localhost:6868",
-    ]
+    load_command = {
 
-    # Preserve order while avoiding duplicate connection attempts.
-    candidate_uris = list(dict.fromkeys(
-        uri.strip() for uri in candidate_uris if uri and uri.strip()
-    ))
 
-    websocket_context = None
-    websocket = None
-    gama_uri = None
-    connection_errors = []
 
-    for candidate_uri in candidate_uris:
-        try:
-            candidate_context = websockets.connect(
-                candidate_uri,
-                open_timeout=5,
-            )
-            candidate_websocket = await candidate_context.__aenter__()
-            websocket_context = candidate_context
-            websocket = candidate_websocket
-            gama_uri = candidate_uri
-            break
-        except Exception as exc:
-            connection_errors.append(
-                f"{candidate_uri}: {type(exc).__name__}: {exc}"
-            )
+        "type": "load",
 
-    if websocket is None:
-        attempted = "\n - ".join(connection_errors)
+
+
+        "model": str(MODEL),
+
+
+
+        "experiment": "web_experiment",
+
+
+
+        "console": False,
+
+
+
+        "parameters": [
+
+
+
+            {
+
+
+
+                "type": "shape_file",
+
+
+
+                "value": buildings_shapefile,
+
+
+
+                "name": "a2_Buildings_Strandeiland",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "file",
+
+
+
+                "value": roads_shapefile,
+
+
+
+                "name": "a1_Street_Strandeiland",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "shape_file",
+
+
+
+                "value": boundary_shapefile,
+
+
+
+                "name": "a3_Outline_Strandeiland",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "float",
+
+
+
+                "value": exposure_radius,
+
+
+
+                "name": "exposure_radius",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "float",
+
+
+
+                "value": exposure_multiplier,
+
+
+
+                "name": "exposure_multiplier",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "float",
+
+
+
+                "value": wtp_upper_limit,
+
+
+
+                "name": "wtp_upper_limit",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "float",
+
+
+
+                "value": lunch_duration,
+
+
+
+                "name": "current_lunch_duration",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "string",
+
+
+
+                "value": str(OUTPUT),
+
+
+
+                "name": "export_file_path",
+
+
+
+            },
+
+
+
+            {
+
+
+
+                "type": "string",
+
+
+
+                "value": "Nature",
+
+
+
+                "name": "building_type_field",
+
+
+
+            },
+
+
+
+        ],
+
+
+
+        "until": "time > 7 #days",
+
+
+
+    }
+
+
+
+    await websocket.send(json.dumps(load_command))
+
+
+
+    load_response = json.loads(
+
+
+
+        await asyncio.wait_for(
+
+
+
+            websocket.recv(),
+
+
+
+            timeout=30,
+
+
+
+        )
+
+
+
+    )
+
+
+
+    if load_response.get("type") != "CommandExecutedSuccessfully":
+
+
+
         raise RuntimeError(
-            "Could not connect to the GAMA websocket server. Tried:\n - "
-            f"{attempted}\n\n"
-            "If Streamlit is running in Docker and GAMA is running on your "
-            "Mac, ws://host.docker.internal:6868 should work once GAMA's "
-            "websocket server is running and listening on port 6868. If both "
-            "are Docker services, ensure the GAMA service is named 'gama' "
-            "and is on the same Docker network."
-        )
 
-    try:
-        await websocket.recv()
 
 
+            "GAMA could not load the experiment: "
 
-        load_command = {
 
 
-
-            "type": "load",
-
-
-
-            "model": str(MODEL),
-
-
-
-            "experiment": "web_experiment",
-
-
-
-            "console": False,
-
-
-
-            "parameters": [
-
-
-
-                {
-
-
-
-                    "type": "shape_file",
-
-
-
-                    "value": buildings_shapefile,
-
-
-
-                    "name": "a2_Buildings_Strandeiland",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "file",
-
-
-
-                    "value": roads_shapefile,
-
-
-
-                    "name": "a1_Street_Strandeiland",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "shape_file",
-
-
-
-                    "value": boundary_shapefile,
-
-
-
-                    "name": "a3_Outline_Strandeiland",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "float",
-
-
-
-                    "value": exposure_radius,
-
-
-
-                    "name": "exposure_radius",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "float",
-
-
-
-                    "value": exposure_multiplier,
-
-
-
-                    "name": "exposure_multiplier",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "float",
-
-
-
-                    "value": wtp_upper_limit,
-
-
-
-                    "name": "wtp_upper_limit",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "float",
-
-
-
-                    "value": lunch_duration,
-
-
-
-                    "name": "current_lunch_duration",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "string",
-
-
-
-                    "value": str(OUTPUT),
-
-
-
-                    "name": "export_file_path",
-
-
-
-                },
-
-
-
-                {
-
-
-
-                    "type": "string",
-
-
-
-                    "value": "Nature",
-
-
-
-                    "name": "building_type_field",
-
-
-
-                },
-
-
-
-            ],
-
-
-
-            "until": "time > 7 #days",
-
-
-
-        }
-
-
-
-        await websocket.send(
-
-
-
-            json.dumps(load_command)
+            f"{load_response}"
 
 
 
@@ -3724,11 +3933,95 @@ async def run_gama(
 
 
 
-        load_response = json.loads(
+    experiment_id = load_response["content"]
 
 
 
-            await websocket.recv()
+    # sync=True means GAMA sends the SimulationEnded message when the
+
+
+
+    # experiment reaches the 'until' condition instead of returning
+
+
+
+    # immediately and forcing Python to poll blindly.
+
+
+
+    play_command = {
+
+
+
+        "type": "play",
+
+
+
+        "exp_id": experiment_id,
+
+
+
+        "sync": True,
+
+
+
+    }
+
+
+
+    await websocket.send(json.dumps(play_command))
+
+
+
+    loop = asyncio.get_running_loop()
+
+
+
+    deadline = loop.time() + RUN_TIMEOUT_SECONDS
+
+
+
+    while True:
+
+
+
+        remaining = deadline - loop.time()
+
+
+
+        if remaining <= 0:
+
+
+
+            raise TimeoutError(
+
+
+
+                "The GAMA simulation did not finish in time."
+
+
+
+            )
+
+
+
+        message = json.loads(
+
+
+
+            await asyncio.wait_for(
+
+
+
+                websocket.recv(),
+
+
+
+                timeout=remaining,
+
+
+
+            )
 
 
 
@@ -3736,19 +4029,35 @@ async def run_gama(
 
 
 
-        if (
+        message_type = message.get("type")
 
 
 
-            load_response.get("type")
+        if message_type == "SimulationEnded":
 
 
 
-            != "CommandExecutedSuccessfully"
+            break
 
 
 
-        ):
+        if message_type in {
+
+
+
+            "MalformedRequest",
+
+
+
+            "UnableToExecuteRequest",
+
+
+
+            "GamaServerError",
+
+
+
+        }:
 
 
 
@@ -3756,11 +4065,11 @@ async def run_gama(
 
 
 
-                "GAMA could not load the experiment: "
+                "GAMA reported an error while running the experiment: "
 
 
 
-                f"{load_response}"
+                f"{message}"
 
 
 
@@ -3768,181 +4077,99 @@ async def run_gama(
 
 
 
-        experiment_id = load_response[
+    # The model writes its final result to OUTPUT. Usually it is available
 
 
 
-            "content"
+    # immediately when SimulationEnded arrives, but allow a short filesystem
 
 
 
-        ]
+    # grace period for the shared Codespaces volume.
 
 
 
-        play_command = {
+    file_deadline = loop.time() + 5
 
 
 
-            "type": "play",
+    while True:
 
 
 
-            "exp_id": experiment_id,
+        if OUTPUT.exists():
 
 
 
-            "sync": False,
+            with open(
 
 
 
-        }
+                OUTPUT,
 
 
 
-        await websocket.send(
+                "r",
 
 
 
-            json.dumps(play_command)
+                encoding="utf-8",
 
 
 
-        )
+            ) as file:
 
 
 
-        await websocket.recv()
+                non_empty_lines = [
 
 
 
-        loop = asyncio.get_running_loop()
+                    line
 
 
 
-        start_time = loop.time()
+                    for line in file
 
 
 
-        while True:
+                    if line.strip()
 
 
 
-            if OUTPUT.exists():
+                ]
 
 
 
-                with open(
+            if len(non_empty_lines) >= 2:
 
 
 
-                    OUTPUT,
+                break
 
 
 
-                    "r",
+        if loop.time() >= file_deadline:
 
 
 
-                    encoding="utf-8",
+            raise RuntimeError(
 
 
 
-                ) as file:
+                "GAMA finished the simulation, but the result CSV was not "
 
 
 
-                    non_empty_lines = [
+                "written completely."
 
 
 
-                        line
+            )
 
 
 
-                        for line in file
-
-
-
-                        if line.strip()
-
-
-
-                    ]
-
-
-
-                if len(non_empty_lines) >= 2:
-
-
-
-                    break
-
-
-
-            if (
-
-
-
-                loop.time() - start_time
-
-
-
-                > RUN_TIMEOUT_SECONDS
-
-
-
-            ):
-
-
-
-                raise TimeoutError(
-
-
-
-                    "The GAMA simulation did not "
-
-
-
-                    "produce a result in time."
-
-
-
-                )
-
-
-
-            await asyncio.sleep(0.2)
-
-
-
-        stop_command = {
-
-
-
-            "type": "stop",
-
-
-
-            "exp_id": experiment_id,
-
-
-
-        }
-
-
-
-        await websocket.send(
-
-
-
-            json.dumps(stop_command)
-
-
-
-        )
-    finally:
-        await websocket_context.__aexit__(None, None, None)
+        await asyncio.sleep(0.1)
 
 
 
@@ -3987,6 +4214,294 @@ async def run_gama(
 
 
     return result
+
+
+
+
+
+async def run_gama_batch(
+
+
+
+    exposure_radius,
+
+
+
+    exposure_multiplier,
+
+
+
+    wtp_upper_limit,
+
+
+
+    lunch_duration,
+
+
+
+    buildings_shapefile,
+
+
+
+    roads_shapefile,
+
+
+
+    boundary_shapefile,
+
+
+
+    number_of_runs,
+
+
+
+    progress_callback=None,
+
+
+
+):
+
+
+
+    """Run repeated simulations while keeping one GAMA connection alive."""
+
+
+
+    websocket_context, websocket = await connect_to_gama_with_retry()
+
+
+
+    results = []
+
+
+
+    try:
+
+
+
+        run_index = 0
+
+
+
+        while run_index < number_of_runs:
+
+
+
+            connection_retry_count = 0
+
+
+
+            while True:
+
+
+
+                try:
+
+
+
+                    result = await run_one_gama_simulation(
+
+
+
+                        websocket,
+
+
+
+                        exposure_radius,
+
+
+
+                        exposure_multiplier,
+
+
+
+                        wtp_upper_limit,
+
+
+
+                        lunch_duration,
+
+
+
+                        buildings_shapefile,
+
+
+
+                        roads_shapefile,
+
+
+
+                        boundary_shapefile,
+
+
+
+                    )
+
+
+
+                    break
+
+
+
+                except (
+
+
+
+                    ConnectionClosed,
+
+
+
+                    ConnectionError,
+
+
+
+                    OSError,
+
+
+
+                ) as exc:
+
+
+
+                    if connection_retry_count >= GAMA_RUN_RETRY_LIMIT:
+
+
+
+                        raise RuntimeError(
+
+
+
+                            "The GAMA service disconnected while running "
+
+
+
+                            f"simulation {run_index + 1}. "
+
+
+
+                            f"Last error: {type(exc).__name__}: {exc}"
+
+
+
+                        ) from exc
+
+
+
+                    connection_retry_count += 1
+
+
+
+                    try:
+
+
+
+                        await websocket_context.__aexit__(
+
+
+
+                            type(exc),
+
+
+
+                            exc,
+
+
+
+                            exc.__traceback__,
+
+
+
+                        )
+
+
+
+                    except Exception:
+
+
+
+                        pass
+
+
+
+                    websocket_context, websocket = (
+
+
+
+                        await connect_to_gama_with_retry()
+
+
+
+                    )
+
+
+
+            results.append(result)
+
+
+
+            run_index += 1
+
+
+
+            if progress_callback is not None:
+
+
+
+                progress_callback(
+
+
+
+                    run_index,
+
+
+
+                    number_of_runs,
+
+
+
+                )
+
+
+
+    finally:
+
+
+
+        try:
+
+
+
+            await websocket_context.__aexit__(
+
+
+
+                None,
+
+
+
+                None,
+
+
+
+                None,
+
+
+
+            )
+
+
+
+        except Exception:
+
+
+
+            pass
+
+
+
+    return results
+
+
 
 
 
@@ -6094,24 +6609,35 @@ if run_clicked:
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-            for run_index in range(NUMBER_OF_RUNS):
+            def update_run_progress(completed_runs, total_runs):
                 status_text.write(
-                    f"Running simulation {run_index + 1} of "
-                    f"{NUMBER_OF_RUNS}..."
+                    f"Running simulation {completed_runs} of "
+                    f"{total_runs}..."
+                )
+                progress_bar.progress(
+                    completed_runs / total_runs
                 )
 
-                result = asyncio.run(
-                    run_gama(
-                        exposure_radius,
-                        exposure_multiplier,
-                        wtp_upper_limit,
-                        lunch_duration,
-                        scenario_buildings_shapefile,
-                        scenario_roads_shapefile,
-                        scenario_boundary_shapefile,
-                    )
-                )
+            status_text.write(
+                f"Connecting to GAMA and starting {NUMBER_OF_RUNS} "
+                "simulations..."
+            )
 
+            batch_results = asyncio.run(
+                run_gama_batch(
+                    exposure_radius,
+                    exposure_multiplier,
+                    wtp_upper_limit,
+                    lunch_duration,
+                    scenario_buildings_shapefile,
+                    scenario_roads_shapefile,
+                    scenario_boundary_shapefile,
+                    NUMBER_OF_RUNS,
+                    progress_callback=update_run_progress,
+                )
+            )
+
+            for result in batch_results:
                 school_results.append(
                     int(result["School_Lunches"])
                 )
@@ -6120,10 +6646,6 @@ if run_clicked:
                 )
                 unhealthy_results.append(
                     int(result["Unhealthy_Lunches"])
-                )
-
-                progress_bar.progress(
-                    (run_index + 1) / NUMBER_OF_RUNS
                 )
 
             average_school = sum(school_results) / NUMBER_OF_RUNS

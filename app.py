@@ -1360,8 +1360,9 @@ try:
             use_container_width=True,
             on_select="rerun",
             selection_mode="single-object",
-            key="amsterdam_scenario_map",
+             key=f"amsterdam_scenario_map_{selected_neighbourhood['id']}",
         )
+        st.write("Selection:", map_event.selection)
                 # ---------------------------------------------------------------
         # MAP SELECTION
         # ---------------------------------------------------------------

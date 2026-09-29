@@ -1,22 +1,80 @@
 import asyncio
+
+
+
 import csv
+
+
+
 import json
+
+
+
 import os
+
+
+
 import shutil
+
+
+
 import tempfile
+
+
+
 import zipfile
+
+
+
 from pathlib import Path
+
+
+
 import matplotlib.pyplot as plt
+
+
+
 import pandas as pd
+
+
+
 import shapefile
+
+
+
 import streamlit as st
+
+
+
 import websockets
+
+
+
 from matplotlib.lines import Line2D
+
+
+
 from matplotlib.patches import Patch
-from pyproj import CRS
+
+
+
+from pyproj import CRS, Transformer
+
+
+
 import requests
+
+
+
 import pydeck as pdk
-from shapely.geometry import shape
+
+
+
+from shapely.geometry import shape, Point
+from shapely.ops import transform as shapely_transform
+
+
+
 import math
 
 
@@ -1895,6 +1953,326 @@ def load_osm_food_environment(
 
 
 
+
+AMSTERDAM_BGT_WFS_URL = (
+    "https://api.data.amsterdam.nl/v1/wfs/bgt/"
+)
+
+RD_CRS = CRS.from_epsg(28992)
+WGS84_TO_RD = Transformer.from_crs(
+    "EPSG:4326",
+    "EPSG:28992",
+    always_xy=True,
+)
+
+
+@st.cache_data(ttl=86400, show_spinner=False)
+def load_amsterdam_roads(neighbourhood_geometry):
+    """Load BGT road centre lines intersecting the selected neighbourhood."""
+    neighbourhood_shape = shape(neighbourhood_geometry)
+    min_lon, min_lat, max_lon, max_lat = get_geometry_bounds(
+        neighbourhood_geometry
+    )
+
+    response = requests.get(
+        AMSTERDAM_BGT_WFS_URL,
+        params={
+            "SERVICE": "WFS",
+            "VERSION": "2.0.0",
+            "REQUEST": "GetFeature",
+            "TYPENAMES": "app:wegdelen-kruinlijn",
+            "OUTPUTFORMAT": "geojson",
+            "SRSNAME": "urn:ogc:def:crs:OGC::CRS84",
+            "COUNT": 10000,
+            "BBOX": (
+                f"{min_lon},{min_lat},"
+                f"{max_lon},{max_lat},"
+                "urn:ogc:def:crs:OGC::CRS84"
+            ),
+        },
+        timeout=90,
+    )
+    response.raise_for_status()
+    data = response.json()
+
+    selected_features = []
+    for feature in data.get("features", []):
+        geometry = feature.get("geometry")
+        if geometry is None:
+            continue
+
+        try:
+            road_shape = shape(geometry)
+        except Exception:
+            continue
+
+        if road_shape.is_empty or not road_shape.intersects(
+            neighbourhood_shape
+        ):
+            continue
+
+        clipped = road_shape.intersection(neighbourhood_shape)
+        if clipped.is_empty:
+            continue
+
+        selected_features.append(
+            {
+                "type": "Feature",
+                "properties": feature.get("properties", {}) or {},
+                "geometry": clipped.__geo_interface__,
+            }
+        )
+
+    return {
+        "type": "FeatureCollection",
+        "features": selected_features,
+    }
+
+
+def transform_wgs84_geometry_to_rd(geometry):
+    """Transform a Shapely geometry from WGS84 lon/lat to EPSG:28992."""
+    return shapely_transform(
+        WGS84_TO_RD.transform,
+        geometry,
+    )
+
+
+def write_shapefile_projection(base_path, crs=RD_CRS):
+    """Write .prj and .cpg sidecars for a generated shapefile."""
+    base_path = Path(base_path)
+    base_path.with_suffix(".prj").write_text(
+        crs.to_wkt(version="WKT1_ESRI"),
+        encoding="utf-8",
+    )
+    base_path.with_suffix(".cpg").write_text(
+        "UTF-8",
+        encoding="utf-8",
+    )
+
+
+def iter_polygon_parts(geometry):
+    """Yield Polygon/MultiPolygon parts from an arbitrary geometry."""
+    if geometry.is_empty:
+        return
+    if geometry.geom_type in {"Polygon", "MultiPolygon"}:
+        yield geometry
+        return
+    if geometry.geom_type == "GeometryCollection":
+        for part in geometry.geoms:
+            yield from iter_polygon_parts(part)
+
+
+def iter_line_parts(geometry):
+    """Yield LineString/MultiLineString parts from an arbitrary geometry."""
+    if geometry.is_empty:
+        return
+    if geometry.geom_type in {"LineString", "MultiLineString"}:
+        yield geometry
+        return
+    if geometry.geom_type == "GeometryCollection":
+        for part in geometry.geoms:
+            yield from iter_line_parts(part)
+
+
+def create_amsterdam_gama_inputs(
+    neighbourhood_id,
+    neighbourhood_geometry,
+    neighbourhood_buildings,
+    school_pois,
+    food_outlet_pois,
+):
+    """
+    Build temporary GAMA-compatible shapefiles for an edited Amsterdam
+    scenario. Buildings/locations, roads and boundary are all written in
+    EPSG:28992 so distances remain metre-based.
+    """
+    scenario_folder = Path(
+        tempfile.mkdtemp(
+            prefix=f"amsterdam_{neighbourhood_id}_",
+            dir=RUNTIME_DIR,
+        )
+    )
+
+    buildings_base = scenario_folder / "amsterdam_locations"
+    roads_base = scenario_folder / "amsterdam_roads"
+    boundary_base = scenario_folder / "amsterdam_boundary"
+
+    # -----------------------------------------------------------------
+    # Locations / buildings
+    # -----------------------------------------------------------------
+    converted_types = {
+        str(poi.get("building_id")): poi.get("gama_type")
+        for poi in food_outlet_pois
+        if poi.get("is_converted")
+    }
+
+    location_counts = {}
+    with shapefile.Writer(
+        str(buildings_base),
+        shapeType=shapefile.POLYGON,
+    ) as writer:
+        writer.field("Nature", "C", size=50)
+        writer.field("Name", "C", size=120)
+        writer.field("Source", "C", size=40)
+
+        # BAG buildings form the residential base. A converted building is
+        # written once with its selected food-outlet category instead.
+        for feature in neighbourhood_buildings.get("features", []):
+            geometry = feature.get("geometry")
+            if geometry is None:
+                continue
+
+            properties = feature.get("properties", {}) or {}
+            building_id = str(properties.get("building_id", ""))
+            category = converted_types.get(
+                building_id,
+                "Residential",
+            )
+
+            try:
+                building_rd = transform_wgs84_geometry_to_rd(
+                    shape(geometry)
+                )
+            except Exception:
+                continue
+
+            for polygon_part in iter_polygon_parts(building_rd):
+                writer.shape(polygon_part.__geo_interface__)
+                writer.record(
+                    category,
+                    str(properties.get("name", building_id))[:120],
+                    (
+                        "Scenario conversion"
+                        if building_id in converted_types
+                        else "BAG"
+                    ),
+                )
+                location_counts[category] = (
+                    location_counts.get(category, 0) + 1
+                )
+
+        # Existing schools are point POIs. Represent them as small polygons
+        # so they can live in the same polygon shapefile expected by GAMA.
+        for poi in school_pois:
+            point_rd = transform_wgs84_geometry_to_rd(
+                Point(
+                    float(poi["longitude"]),
+                    float(poi["latitude"]),
+                )
+            )
+            school_polygon = point_rd.buffer(4.0)
+            writer.shape(school_polygon.__geo_interface__)
+            writer.record(
+                "School",
+                str(poi.get("name", "School"))[:120],
+                str(poi.get("source", "OpenStreetMap"))[:40],
+            )
+            location_counts["School"] = (
+                location_counts.get("School", 0) + 1
+            )
+
+        # Existing and edited OSM outlets are also represented by small
+        # polygons. Converted residential buildings were already written
+        # above, using their full BAG footprint, so skip their markers here.
+        for poi in food_outlet_pois:
+            if poi.get("is_converted"):
+                continue
+
+            category = str(poi.get("gama_type", "")).strip()
+            if category not in FOOD_OUTLET_TYPES:
+                continue
+
+            point_rd = transform_wgs84_geometry_to_rd(
+                Point(
+                    float(poi["longitude"]),
+                    float(poi["latitude"]),
+                )
+            )
+            outlet_polygon = point_rd.buffer(4.0)
+            writer.shape(outlet_polygon.__geo_interface__)
+            writer.record(
+                category,
+                str(poi.get("name", category))[:120],
+                str(poi.get("source", "OpenStreetMap"))[:40],
+            )
+            location_counts[category] = (
+                location_counts.get(category, 0) + 1
+            )
+
+    write_shapefile_projection(buildings_base)
+
+    # -----------------------------------------------------------------
+    # Study-area boundary
+    # -----------------------------------------------------------------
+    boundary_rd = transform_wgs84_geometry_to_rd(
+        shape(neighbourhood_geometry)
+    )
+    with shapefile.Writer(
+        str(boundary_base),
+        shapeType=shapefile.POLYGON,
+    ) as writer:
+        writer.field("ID", "C", size=80)
+        for polygon_part in iter_polygon_parts(boundary_rd):
+            writer.shape(polygon_part.__geo_interface__)
+            writer.record(str(neighbourhood_id))
+    write_shapefile_projection(boundary_base)
+
+    # -----------------------------------------------------------------
+    # Road network
+    # -----------------------------------------------------------------
+    road_features = load_amsterdam_roads(
+        neighbourhood_geometry
+    )
+    road_count = 0
+    with shapefile.Writer(
+        str(roads_base),
+        shapeType=shapefile.POLYLINE,
+    ) as writer:
+        writer.field("ID", "N", size=12, decimal=0)
+
+        for feature in road_features.get("features", []):
+            geometry = feature.get("geometry")
+            if geometry is None:
+                continue
+
+            try:
+                road_rd = transform_wgs84_geometry_to_rd(
+                    shape(geometry)
+                )
+            except Exception:
+                continue
+
+            for line_part in iter_line_parts(road_rd):
+                road_count += 1
+                writer.shape(line_part.__geo_interface__)
+                writer.record(road_count)
+
+    write_shapefile_projection(roads_base)
+
+    if road_count == 0:
+        raise ValueError(
+            "No road lines were found for the selected Amsterdam neighbourhood."
+        )
+
+    if location_counts.get("School", 0) == 0:
+        raise ValueError(
+            "No schools were found in the selected Amsterdam neighbourhood."
+        )
+
+    if location_counts.get("Residential", 0) == 0:
+        raise ValueError(
+            "No residential buildings remain in the selected Amsterdam scenario."
+        )
+
+    return {
+        "buildings": str(buildings_base.with_suffix(".shp")),
+        "roads": str(roads_base.with_suffix(".shp")),
+        "boundary": str(boundary_base.with_suffix(".shp")),
+        "location_counts": location_counts,
+        "road_count": road_count,
+    }
+
+
 def normalize_building_type_field(
 
 
@@ -3647,7 +4025,23 @@ if "selected_amsterdam_neighbourhood_id" not in st.session_state:
 
 st.header("1. Study area")
 
-st.subheader("Amsterdam neighbourhood prototype")
+study_area_source = st.radio(
+    "Which food environment should this scenario use?",
+    [
+        "Amsterdam neighbourhood",
+        "Uploaded food environment",
+    ],
+    horizontal=True,
+)
+
+selected_neighbourhood_name = None
+neighbourhood_id = None
+neighbourhood_geometry = None
+neighbourhood_buildings = None
+school_pois = []
+food_outlet_pois = []
+
+st.subheader("Approach 1: Amsterdam neighbourhood")
 
 
 
@@ -4728,6 +5122,8 @@ except Exception as exc:
 
 
 
+st.subheader("Approach 2: Upload your own food environment")
+
 st.caption(
 
 
@@ -5437,951 +5833,283 @@ run_clicked = st.button(
 
 
 if run_clicked:
-
-
-
-    if (
-
-
-
-        uploaded_buildings is None
-
-
-
-        or uploaded_roads is None
-
-
-
-        or uploaded_boundary is None
-
-
-
-    ):
-
-
-
-        st.error(
-
-
-
-            "Please upload the buildings, roads and boundary files first."
-
-
-
-        )
-
-
-
-    elif not all_mapped:
-
-
-
-        st.error(
-
-
-
-            "Please map all location types that occur "
-
-
-
-            "in the uploaded buildings file."
-
-
-
-        )
-
-
-
-    elif not has_school:
-
-
-
-        st.error(
-
-
-
-            "The uploaded data must contain at least one "
-
-
-
-            "location mapped to School."
-
-
-
-        )
-
-
-
-    elif not has_residential:
-
-
-
-        st.error(
-
-
-
-            "The uploaded data must contain at least one "
-
-
-
-            "location mapped to Residential or Nature."
-
-
-
-        )
-
-
-
-    elif not scenario_name.strip():
-
-
-
-        st.error(
-
-
-
-            "Please enter a scenario name."
-
-
-
-        )
-
-
-
+    if not scenario_name.strip():
+        st.error("Please enter a scenario name.")
     else:
-
-
-
         try:
+            amsterdam_input_summary = None
 
+            if study_area_source == "Amsterdam neighbourhood":
+                if (
+                    not selected_neighbourhood_name
+                    or neighbourhood_id is None
+                    or neighbourhood_geometry is None
+                    or neighbourhood_buildings is None
+                ):
+                    raise ValueError(
+                        "Please select an Amsterdam neighbourhood first."
+                    )
 
+                if not school_pois:
+                    raise ValueError(
+                        "No schools are available for the selected Amsterdam "
+                        "neighbourhood. The scenario cannot run without a school."
+                    )
 
-            roads_shapefile = prepare_shapefile(
+                amsterdam_inputs = create_amsterdam_gama_inputs(
+                    neighbourhood_id,
+                    neighbourhood_geometry,
+                    neighbourhood_buildings,
+                    school_pois,
+                    food_outlet_pois,
+                )
 
+                scenario_buildings_shapefile = amsterdam_inputs["buildings"]
+                scenario_roads_shapefile = amsterdam_inputs["roads"]
+                scenario_boundary_shapefile = amsterdam_inputs["boundary"]
+                scenario_source_label = (
+                    f"Amsterdam — {selected_neighbourhood_name}"
+                )
+                amsterdam_input_summary = amsterdam_inputs
 
+            else:
+                if (
+                    uploaded_buildings is None
+                    or uploaded_roads is None
+                    or uploaded_boundary is None
+                ):
+                    raise ValueError(
+                        "Please upload the buildings, roads and boundary files first."
+                    )
 
-                uploaded_roads
+                if not all_mapped:
+                    raise ValueError(
+                        "Please map all location types that occur in the uploaded "
+                        "buildings file."
+                    )
 
+                if not has_school:
+                    raise ValueError(
+                        "The uploaded data must contain at least one location "
+                        "mapped to School."
+                    )
 
+                if not has_residential:
+                    raise ValueError(
+                        "The uploaded data must contain at least one location "
+                        "mapped to Residential or Nature."
+                    )
 
-            )
+                roads_shapefile = prepare_shapefile(
+                    uploaded_roads
+                )
+                boundary_shapefile = prepare_shapefile(
+                    uploaded_boundary
+                )
 
+                normalized_buildings_shapefile = (
+                    normalize_building_type_field(
+                        buildings_shapefile,
+                        building_type_field,
+                        value_mapping,
+                    )
+                )
 
+                scenario_buildings_shapefile = (
+                    normalized_buildings_shapefile
+                )
+                scenario_roads_shapefile = roads_shapefile
+                scenario_boundary_shapefile = boundary_shapefile
+                scenario_source_label = "Uploaded food environment"
 
-            boundary_shapefile = prepare_shapefile(
-
-
-
-                uploaded_boundary
-
-
-
-            )
-
-
-
+            # ---------------------------------------------------------
+            # Shared GIS validation for both study-area approaches.
+            # ---------------------------------------------------------
             crs_check = validate_crs(
-
-
-
-                buildings_shapefile,
-
-
-
-                roads_shapefile,
-
-
-
-                boundary_shapefile,
-
-
-
+                scenario_buildings_shapefile,
+                scenario_roads_shapefile,
+                scenario_boundary_shapefile,
             )
-
-
 
             buildings_geometry = get_geometry_type(
-
-
-
-                buildings_shapefile
-
-
-
+                scenario_buildings_shapefile
             )
-
-
-
             roads_geometry = get_geometry_type(
-
-
-
-                roads_shapefile
-
-
-
+                scenario_roads_shapefile
             )
-
-
-
             boundary_geometry = get_geometry_type(
-
-
-
-                boundary_shapefile
-
-
-
+                scenario_boundary_shapefile
             )
-
-
 
             with st.expander(
-
-
-
                 "Validation details",
-
-
-
                 expanded=False,
-
-
-
             ):
-
-
-
-                st.write(
-
-
-
-                    "Buildings geometry:",
-
-
-
-                    buildings_geometry,
-
-
-
-                )
-
-
-
-                st.write(
-
-
-
-                    "Roads geometry:",
-
-
-
-                    roads_geometry,
-
-
-
-                )
-
-
-
-                st.write(
-
-
-
-                    "Boundary geometry:",
-
-
-
-                    boundary_geometry,
-
-
-
-                )
-
-
-
-                st.write(
-
-
-
-                    "Buildings CRS:",
-
-
-
-                    crs_check["buildings"].name,
-
-
-
-                )
-
-
-
-                st.write(
-
-
-
-                    "Roads CRS:",
-
-
-
-                    crs_check["roads"].name,
-
-
-
-                )
-
-
-
-                st.write(
-
-
-
-                    "Boundary CRS:",
-
-
-
-                    crs_check["boundary"].name,
-
-
-
-                )
-
-
+                st.write("Scenario source:", scenario_source_label)
+                st.write("Buildings geometry:", buildings_geometry)
+                st.write("Roads geometry:", roads_geometry)
+                st.write("Boundary geometry:", boundary_geometry)
+                st.write("Buildings CRS:", crs_check["buildings"].name)
+                st.write("Roads CRS:", crs_check["roads"].name)
+                st.write("Boundary CRS:", crs_check["boundary"].name)
+
+                if amsterdam_input_summary is not None:
+                    st.write(
+                        "Amsterdam location counts:",
+                        amsterdam_input_summary["location_counts"],
+                    )
+                    st.write(
+                        "Amsterdam road segments:",
+                        amsterdam_input_summary["road_count"],
+                    )
 
             if buildings_geometry != "Polygon":
-
-
-
                 raise ValueError(
-
-
-
-                    "The buildings layer must contain polygon geometries."
-
-
-
+                    "The buildings / locations layer must contain polygon geometries."
                 )
-
-
 
             if roads_geometry != "Polyline":
-
-
-
                 raise ValueError(
-
-
-
                     "The road network must contain line geometries."
-
-
-
                 )
-
-
 
             if boundary_geometry != "Polygon":
-
-
-
                 raise ValueError(
-
-
-
                     "The study area boundary must contain polygon geometries."
-
-
-
                 )
-
-
 
             if not crs_check["same_crs"]:
-
-
-
                 raise ValueError(
-
-
-
-                    "The buildings, roads and boundary layers "
-
-
-
-                    "do not use the same coordinate system."
-
-
-
+                    "The buildings, roads and boundary layers do not use the "
+                    "same coordinate system."
                 )
-
-
 
             st.success(
-
-
-
-                "GIS validation passed."
-
-
-
+                f"GIS validation passed for {scenario_source_label}."
             )
-
-
-
-            normalized_buildings_shapefile = (
-
-
-
-                normalize_building_type_field(
-
-
-
-                    buildings_shapefile,
-
-
-
-                    building_type_field,
-
-
-
-                    value_mapping,
-
-
-
-                )
-
-
-
-            )
-
-
 
             st.subheader("Scenario preview")
-
-
-
             scenario_figure = plot_scenario_preview(
-
-
-
-                normalized_buildings_shapefile,
-
-
-
-                roads_shapefile,
-
-
-
-                boundary_shapefile,
-
-
-
+                scenario_buildings_shapefile,
+                scenario_roads_shapefile,
+                scenario_boundary_shapefile,
             )
-
-
-
             st.pyplot(
-
-
-
                 scenario_figure,
-
-
-
                 use_container_width=True,
-
-
-
             )
-
-
-
-            plt.close(
-
-
-
-                scenario_figure
-
-
-
-            )
-
-
+            plt.close(scenario_figure)
 
             with st.expander(
-
-
-
                 "Input files",
-
-
-
                 expanded=False,
-
-
-
             ):
-
-
-
+                st.write("Source:", scenario_source_label)
                 st.write(
-
-
-
-                    "Buildings:",
-
-
-
-                    Path(buildings_shapefile).name,
-
-
-
+                    "Buildings / locations:",
+                    Path(scenario_buildings_shapefile).name,
                 )
-
-
-
                 st.write(
-
-
-
                     "Roads:",
-
-
-
-                    Path(roads_shapefile).name,
-
-
-
+                    Path(scenario_roads_shapefile).name,
                 )
-
-
-
                 st.write(
-
-
-
                     "Boundary:",
-
-
-
-                    Path(boundary_shapefile).name,
-
-
-
+                    Path(scenario_boundary_shapefile).name,
                 )
-
-
 
             school_results = []
-
-
-
             healthy_results = []
-
-
-
             unhealthy_results = []
 
-
-
             progress_bar = st.progress(0)
-
-
-
             status_text = st.empty()
 
-
-
-            for run_index in range(
-
-
-
-                NUMBER_OF_RUNS
-
-
-
-            ):
-
-
-
+            for run_index in range(NUMBER_OF_RUNS):
                 status_text.write(
-
-
-
-                    f"Running simulation "
-
-
-
-                    f"{run_index + 1} of "
-
-
-
+                    f"Running simulation {run_index + 1} of "
                     f"{NUMBER_OF_RUNS}..."
-
-
-
                 )
-
-
 
                 result = asyncio.run(
-
-
-
                     run_gama(
-
-
-
                         exposure_radius,
-
-
-
                         exposure_multiplier,
-
-
-
                         wtp_upper_limit,
-
-
-
                         lunch_duration,
-
-
-
-                        normalized_buildings_shapefile,
-
-
-
-                        roads_shapefile,
-
-
-
-                        boundary_shapefile,
-
-
-
+                        scenario_buildings_shapefile,
+                        scenario_roads_shapefile,
+                        scenario_boundary_shapefile,
                     )
-
-
-
                 )
-
-
 
                 school_results.append(
-
-
-
-                    int(
-
-
-
-                        result[
-
-
-
-                            "School_Lunches"
-
-
-
-                        ]
-
-
-
-                    )
-
-
-
+                    int(result["School_Lunches"])
                 )
-
-
-
                 healthy_results.append(
-
-
-
-                    int(
-
-
-
-                        result[
-
-
-
-                            "Healthy_Lunches"
-
-
-
-                        ]
-
-
-
-                    )
-
-
-
+                    int(result["Healthy_Lunches"])
                 )
-
-
-
                 unhealthy_results.append(
-
-
-
-                    int(
-
-
-
-                        result[
-
-
-
-                            "Unhealthy_Lunches"
-
-
-
-                        ]
-
-
-
-                    )
-
-
-
+                    int(result["Unhealthy_Lunches"])
                 )
-
-
 
                 progress_bar.progress(
-
-
-
-                    (run_index + 1)
-
-
-
-                    / NUMBER_OF_RUNS
-
-
-
+                    (run_index + 1) / NUMBER_OF_RUNS
                 )
 
-
-
-            average_school = (
-
-
-
-                sum(school_results)
-
-
-
-                / NUMBER_OF_RUNS
-
-
-
-            )
-
-
-
-            average_healthy = (
-
-
-
-                sum(healthy_results)
-
-
-
-                / NUMBER_OF_RUNS
-
-
-
-            )
-
-
-
+            average_school = sum(school_results) / NUMBER_OF_RUNS
+            average_healthy = sum(healthy_results) / NUMBER_OF_RUNS
             average_unhealthy = (
-
-
-
-                sum(unhealthy_results)
-
-
-
-                / NUMBER_OF_RUNS
-
-
-
+                sum(unhealthy_results) / NUMBER_OF_RUNS
             )
-
-
 
             scenario_result = {
-
-
-
                 "Scenario": scenario_name.strip(),
-
-
-
+                "Source": scenario_source_label,
                 "Exposure radius": exposure_radius,
-
-
-
                 "Exposure multiplier": exposure_multiplier,
-
-
-
                 "WTP upper limit": wtp_upper_limit,
-
-
-
                 "Lunch duration": lunch_duration,
-
-
-
                 "On-campus": average_school,
-
-
-
                 "Healthy": average_healthy,
-
-
-
                 "Unhealthy": average_unhealthy,
-
-
-
             }
 
-
-
             st.session_state.scenario_results.append(
-
-
-
                 scenario_result
-
-
-
             )
-
-
 
             status_text.empty()
-
-
-
             progress_bar.empty()
 
-
-
             st.success(
-
-
-
                 f"{NUMBER_OF_RUNS} simulations completed."
-
-
-
             )
-
-
 
             st.subheader("Results")
-
-
-
             st.caption(
-
-
-
-                f"Average number of lunch decisions "
-
-
-
-                f"across {NUMBER_OF_RUNS} simulations."
-
-
-
+                f"Average number of lunch decisions across "
+                f"{NUMBER_OF_RUNS} simulations."
             )
 
-
-
-            result_col1, result_col2, result_col3 = (
-
-
-
-                st.columns(3)
-
-
-
-            )
-
-
-
+            result_col1, result_col2, result_col3 = st.columns(3)
             result_col1.metric(
-
-
-
                 "On-campus lunches",
-
-
-
                 f"{average_school:.1f}",
-
-
-
             )
-
-
-
             result_col2.metric(
-
-
-
                 "Healthy outlet visits",
-
-
-
                 f"{average_healthy:.1f}",
-
-
-
             )
-
-
-
             result_col3.metric(
-
-
-
                 "Unhealthy outlet visits",
-
-
-
                 f"{average_unhealthy:.1f}",
-
-
-
             )
-
-
 
         except Exception as error:
-
-
-
             st.error(
-
-
-
                 f"Could not run scenario: {error}"
-
-
-
             )
-
 
 
 # ---------------------------------------------------------------------

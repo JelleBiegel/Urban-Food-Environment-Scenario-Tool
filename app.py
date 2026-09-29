@@ -560,7 +560,9 @@ def load_osm_food_environment(
 
     pois = []
 
-    for feature in osm_data.get("features", []):
+    for feature_index, feature in enumerate(
+        osm_data.get("features", [])
+        ):
         geometry = feature.get("geometry")
         properties = feature.get("properties", {}) or {}
 
@@ -596,7 +598,7 @@ def load_osm_food_environment(
             properties.get("@id")
             or properties.get("id")
             or feature.get("id")
-            or ""
+            or f"local_{feature_index}"
         )
 
         pois.append(

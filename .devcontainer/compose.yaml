@@ -18,3 +18,4 @@ services:
     command:
       - "-socket"
       - "6868"
+    restart: unless-stopped

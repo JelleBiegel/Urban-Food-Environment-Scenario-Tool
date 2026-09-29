@@ -1457,6 +1457,8 @@ try:
                 "Unknown",
             )
 
+            selected_osm_id = selected_object.get("osm_id")
+
             st.write(
                 "**Name:**",
                 location_name,
@@ -1475,10 +1477,15 @@ try:
                 ),
             )
 
-            if current_type != "School":
+            is_food_outlet = any(
+                poi.get("osm_id") == selected_osm_id
+                for poi in food_outlet_pois
+            )
+
+            if is_food_outlet:
                 edit_key = (
                     f"{selected_neighbourhood['id']}::"
-                    f"{selected_object['osm_id']}"
+                    f"{selected_osm_id}"
                 )
 
                 if current_type in FOOD_OUTLET_TYPES:
@@ -1538,9 +1545,8 @@ try:
 
             else:
                 st.info(
-                    "Schools are currently fixed and cannot be edited."
+                    "This selected location is not an editable food outlet."
                 )
-
 except Exception as exc:
     st.error(
         f"Could not load Amsterdam study-area data: {exc}"

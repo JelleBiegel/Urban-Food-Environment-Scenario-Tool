@@ -12,6 +12,8 @@ import json
 
 import os
 
+import socket
+
 
 
 import shutil
@@ -175,7 +177,7 @@ OUTPUT = Path(
 
 
 
-GAMA_URI = os.getenv("GAMA_URI", "ws://localhost:6868")
+GAMA_URI = os.getenv("GAMA_URI", "ws://127.0.0.1:6868").strip()
 
 
 
@@ -3440,18 +3442,42 @@ async def run_gama(
 
 
 
-    async with websockets.connect(
+    # Connect to GAMA. Using the numeric loopback address avoids local
+    # hostname/DNS resolution problems that can produce
+    # ``[Errno -2] Name or service not known`` on some systems.
+    gama_uri = GAMA_URI
+    fallback_uri = "ws://127.0.0.1:6868"
 
+    try:
+        websocket_context = websockets.connect(gama_uri)
+        websocket = await websocket_context.__aenter__()
+    except socket.gaierror as exc:
+        if gama_uri == fallback_uri:
+            raise RuntimeError(
+                f"Could not resolve the GAMA websocket address {gama_uri!r}. "
+                "Make sure GAMA is running with its websocket server enabled "
+                "on port 6868."
+            ) from exc
 
+        try:
+            websocket_context = websockets.connect(fallback_uri)
+            websocket = await websocket_context.__aenter__()
+            gama_uri = fallback_uri
+        except Exception as fallback_exc:
+            raise RuntimeError(
+                f"Could not resolve/connect to the configured GAMA address "
+                f"{GAMA_URI!r}, and the local fallback {fallback_uri!r} also "
+                "failed. Make sure GAMA is running with its websocket server "
+                "enabled on port 6868."
+            ) from fallback_exc
+    except OSError as exc:
+        raise RuntimeError(
+            f"Could not connect to GAMA at {gama_uri!r}: {exc}. "
+            "Make sure GAMA is running and its websocket server is listening "
+            "on port 6868."
+        ) from exc
 
-        GAMA_URI
-
-
-
-    ) as websocket:
-
-
-
+    try:
         await websocket.recv()
 
 
@@ -3901,6 +3927,8 @@ async def run_gama(
 
 
         )
+    finally:
+        await websocket_context.__aexit__(None, None, None)
 
 
 

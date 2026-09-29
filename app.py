@@ -1365,29 +1365,46 @@ try:
                 # ---------------------------------------------------------------
         # MAP SELECTION
         # ---------------------------------------------------------------
-        
+
         if map_event and map_event.selection:
             selected_objects = map_event.selection.get(
                 "objects",
                 {}
             )
-        
+
+            candidates = []
+
             for layer_id in ["food-outlets", "schools"]:
-                objects = selected_objects.get(
-                    layer_id,
-                    []
+                for obj in selected_objects.get(layer_id, []):
+                    osm_id = obj.get("osm_id")
+
+                    if osm_id:
+                        candidates.append(
+                            {
+                                "osm_id": osm_id,
+                                "layer": layer_id,
+                            }
+                        )
+
+            if candidates:
+                current_selection = (
+                    st.session_state.selected_amsterdam_poi
                 )
-        
-                if objects:
-                    clicked_object = objects[0]
-        
-                    st.session_state.selected_amsterdam_poi = {
-                        "osm_id": clicked_object.get("osm_id"),
-                        "layer": layer_id,
-                    }
-        
-                    break
-        
+
+                # Prefer a newly clicked object over the object
+                # that was already selected.
+                new_selection = next(
+                    (
+                        candidate
+                        for candidate in candidates
+                        if candidate != current_selection
+                    ),
+                    candidates[0],
+                )
+
+                st.session_state.selected_amsterdam_poi = (
+                    new_selection
+                )
         
         # ---------------------------------------------------------------
         # FIND THE CURRENT VERSION OF THE SELECTED OBJECT
@@ -1680,7 +1697,9 @@ uploaded_boundary = st.file_uploader(
     type=["zip"],
 )
 
-
+        if st.button("Clear selection"):
+            st.session_state.selected_amsterdam_poi = None
+            st.rerun()
 # ---------------------------------------------------------------------
 # 2. CONFIGURE SCENARIO
 # ---------------------------------------------------------------------

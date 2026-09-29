@@ -3442,40 +3442,54 @@ async def run_gama(
 
 
 
-    # Connect to GAMA. Using the numeric loopback address avoids local
-    # hostname/DNS resolution problems that can produce
-    # ``[Errno -2] Name or service not known`` on some systems.
-    gama_uri = GAMA_URI
-    fallback_uri = "ws://127.0.0.1:6868"
+    # Connect to GAMA. The Streamlit app may run directly on the host,
+    # in Docker with GAMA in another container, or in Docker while GAMA runs
+    # natively on the host. Try the appropriate common addresses in order.
+    candidate_uris = [
+        GAMA_URI,
+        "ws://gama:6868",
+        "ws://host.docker.internal:6868",
+        "ws://127.0.0.1:6868",
+        "ws://localhost:6868",
+    ]
 
-    try:
-        websocket_context = websockets.connect(gama_uri)
-        websocket = await websocket_context.__aenter__()
-    except socket.gaierror as exc:
-        if gama_uri == fallback_uri:
-            raise RuntimeError(
-                f"Could not resolve the GAMA websocket address {gama_uri!r}. "
-                "Make sure GAMA is running with its websocket server enabled "
-                "on port 6868."
-            ) from exc
+    # Preserve order while avoiding duplicate connection attempts.
+    candidate_uris = list(dict.fromkeys(
+        uri.strip() for uri in candidate_uris if uri and uri.strip()
+    ))
 
+    websocket_context = None
+    websocket = None
+    gama_uri = None
+    connection_errors = []
+
+    for candidate_uri in candidate_uris:
         try:
-            websocket_context = websockets.connect(fallback_uri)
-            websocket = await websocket_context.__aenter__()
-            gama_uri = fallback_uri
-        except Exception as fallback_exc:
-            raise RuntimeError(
-                f"Could not resolve/connect to the configured GAMA address "
-                f"{GAMA_URI!r}, and the local fallback {fallback_uri!r} also "
-                "failed. Make sure GAMA is running with its websocket server "
-                "enabled on port 6868."
-            ) from fallback_exc
-    except OSError as exc:
+            candidate_context = websockets.connect(
+                candidate_uri,
+                open_timeout=5,
+            )
+            candidate_websocket = await candidate_context.__aenter__()
+            websocket_context = candidate_context
+            websocket = candidate_websocket
+            gama_uri = candidate_uri
+            break
+        except Exception as exc:
+            connection_errors.append(
+                f"{candidate_uri}: {type(exc).__name__}: {exc}"
+            )
+
+    if websocket is None:
+        attempted = "\n - ".join(connection_errors)
         raise RuntimeError(
-            f"Could not connect to GAMA at {gama_uri!r}: {exc}. "
-            "Make sure GAMA is running and its websocket server is listening "
-            "on port 6868."
-        ) from exc
+            "Could not connect to the GAMA websocket server. Tried:\n - "
+            f"{attempted}\n\n"
+            "If Streamlit is running in Docker and GAMA is running on your "
+            "Mac, ws://host.docker.internal:6868 should work once GAMA's "
+            "websocket server is running and listening on port 6868. If both "
+            "are Docker services, ensure the GAMA service is named 'gama' "
+            "and is on the same Docker network."
+        )
 
     try:
         await websocket.recv()

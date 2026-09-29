@@ -1682,6 +1682,10 @@ if uploaded_buildings is not None:
             or "Nature" in mapped_categories
         )
 
+        if st.button("Clear selection"):
+            st.session_state.selected_amsterdam_poi = None
+            st.rerun()
+            
     except Exception as error:
         st.error(
             f"Could not read buildings shapefile: {error}"
@@ -1697,9 +1701,6 @@ uploaded_boundary = st.file_uploader(
     type=["zip"],
 )
 
-        if st.button("Clear selection"):
-            st.session_state.selected_amsterdam_poi = None
-            st.rerun()
 # ---------------------------------------------------------------------
 # 2. CONFIGURE SCENARIO
 # ---------------------------------------------------------------------

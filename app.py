@@ -1419,7 +1419,7 @@ try:
             selected_layer = saved_selection["layer"]
             selected_id = saved_selection["osm_id"]
         
-            if selected_layer == "food-outlets":
+            if selected_layer != "food-outlets":
                 selected_object = next(
                     (
                         poi
@@ -1446,27 +1446,27 @@ try:
         
         if selected_object:
             st.subheader("Selected location")
-        
+
             location_name = selected_object.get(
                 "name",
                 "Unnamed location",
             )
-        
+
             current_type = selected_object.get(
                 "gama_type",
                 "Unknown",
             )
-        
+
             st.write(
                 "**Name:**",
                 location_name,
             )
-        
+
             st.write(
                 "**Current model category:**",
                 current_type,
             )
-        
+
             st.write(
                 "**Source:**",
                 selected_object.get(
@@ -1474,29 +1474,29 @@ try:
                     "Unknown",
                 ),
             )
-        
-            if selected_layer == "food-outlets":
+
+            if current_type != "School":
                 edit_key = (
                     f"{selected_neighbourhood['id']}::"
                     f"{selected_object['osm_id']}"
                 )
-        
+
                 if current_type in FOOD_OUTLET_TYPES:
                     default_index = FOOD_OUTLET_TYPES.index(
                         current_type
                     )
                 else:
                     default_index = 0
-        
+
                 new_type = st.selectbox(
                     "Change food outlet category",
                     FOOD_OUTLET_TYPES,
                     index=default_index,
                     key=f"category_{edit_key}",
                 )
-        
+
                 edit_col1, edit_col2, edit_col3 = st.columns(3)
-        
+
                 with edit_col1:
                     if st.button(
                         "Apply change",
@@ -1506,9 +1506,9 @@ try:
                         st.session_state.amsterdam_poi_edits[
                             edit_key
                         ] = new_type
-        
+
                         st.rerun()
-        
+
                 with edit_col2:
                     if st.button(
                         "Remove outlet",
@@ -1518,11 +1518,11 @@ try:
                         st.session_state.amsterdam_poi_edits[
                             edit_key
                         ] = "__REMOVE__"
-        
+
                         st.session_state.selected_amsterdam_poi = None
-        
+
                         st.rerun()
-        
+
                 with edit_col3:
                     if st.button(
                         "Reset",
@@ -1533,13 +1533,13 @@ try:
                             edit_key,
                             None,
                         )
-        
+
                         st.rerun()
-        
-        elif saved_selection:
-            st.info(
-                "The selected location is no longer part of this scenario."
-            )
+
+            else:
+                st.info(
+                    "Schools are currently fixed and cannot be edited."
+                )
 
 except Exception as exc:
     st.error(

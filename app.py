@@ -1252,6 +1252,34 @@ try:
                 for poi in osm_pois
                 if poi["gama_type"] != "School"
             ]
+            edited_food_outlets = []
+
+            for poi in food_outlet_pois:
+                edited_poi = poi.copy()
+
+                edit_key = (
+                    f"{selected_neighbourhood['id']}::"
+                    f"{poi['osm_id']}"
+                )
+
+                saved_edit = st.session_state.amsterdam_poi_edits.get(
+                    edit_key
+                )
+
+                if saved_edit == "__REMOVE__":
+                    continue
+
+                if saved_edit:
+                    edited_poi["gama_type"] = saved_edit
+                    edited_poi["edited"] = True
+                else:
+                    edited_poi["edited"] = False
+
+                edited_food_outlets.append(
+                    edited_poi
+                )
+
+            food_outlet_pois = edited_food_outlets
 
             st.success(
                 f"{len(school_pois)} schools and "
@@ -1312,7 +1340,11 @@ try:
             data=food_outlet_pois,
             id="food-outlets",
             get_position="[longitude, latitude]",
-            get_fill_color=[217, 119, 87, 230],
+            get_fill_color="""
+                edited
+                ? [140, 80, 200, 240]
+                : [217, 119, 87, 230]
+            """,
             get_line_color=[120, 60, 40],
             get_radius=10,
             radius_min_pixels=5,

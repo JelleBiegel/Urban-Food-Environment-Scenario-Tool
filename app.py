@@ -1954,8 +1954,8 @@ def load_osm_food_environment(
 
 
 
-AMSTERDAM_BGT_WFS_URL = (
-    "https://api.data.amsterdam.nl/v1/wfs/bgt/"
+AMSTERDAM_BRT10_WFS_URL = (
+    "https://api.data.amsterdam.nl/v1/wfs/brt10/"
 )
 
 RD_CRS = CRS.from_epsg(28992)
@@ -1968,64 +1968,91 @@ WGS84_TO_RD = Transformer.from_crs(
 
 @st.cache_data(ttl=86400, show_spinner=False)
 def load_amsterdam_roads(neighbourhood_geometry):
-    """Load BGT road centre lines intersecting the selected neighbourhood."""
+    """
+    Load BRT10 road centre lines intersecting the selected neighbourhood.
+
+    The BGT ``kruinlijn`` is not a street centreline; it describes crest
+    lines associated with terrain/road slopes and is therefore often absent.
+    TOP10NL/BRT10 exposes dedicated road centre geometry (wegdeel hartlijnen),
+    which is the appropriate line network for the GAMA street layer.
+    """
     neighbourhood_shape = shape(neighbourhood_geometry)
     min_lon, min_lat, max_lon, max_lat = get_geometry_bounds(
         neighbourhood_geometry
     )
 
-    response = requests.get(
-        AMSTERDAM_BGT_WFS_URL,
-        params={
-            "SERVICE": "WFS",
-            "VERSION": "2.0.0",
-            "REQUEST": "GetFeature",
-            "TYPENAMES": "app:wegdelen-kruinlijn",
-            "OUTPUTFORMAT": "geojson",
-            "SRSNAME": "urn:ogc:def:crs:OGC::CRS84",
-            "COUNT": 10000,
-            "BBOX": (
-                f"{min_lon},{min_lat},"
-                f"{max_lon},{max_lat},"
-                "urn:ogc:def:crs:OGC::CRS84"
-            ),
-        },
-        timeout=90,
-    )
-    response.raise_for_status()
-    data = response.json()
+    # Prefer the dedicated road-centre geometry. If a neighbourhood happens
+    # to have no heartlines in BRT10, fall back to the general road line
+    # geometry rather than failing immediately.
+    road_typenames = [
+        "app:wegdeelhartlijnen-geometrie_lijn",
+        "app:wegdelen-geometrie_lijn",
+    ]
 
-    selected_features = []
-    for feature in data.get("features", []):
-        geometry = feature.get("geometry")
-        if geometry is None:
-            continue
-
-        try:
-            road_shape = shape(geometry)
-        except Exception:
-            continue
-
-        if road_shape.is_empty or not road_shape.intersects(
-            neighbourhood_shape
-        ):
-            continue
-
-        clipped = road_shape.intersection(neighbourhood_shape)
-        if clipped.is_empty:
-            continue
-
-        selected_features.append(
-            {
-                "type": "Feature",
-                "properties": feature.get("properties", {}) or {},
-                "geometry": clipped.__geo_interface__,
-            }
+    for typename in road_typenames:
+        response = requests.get(
+            AMSTERDAM_BRT10_WFS_URL,
+            params={
+                "SERVICE": "WFS",
+                "VERSION": "2.0.0",
+                "REQUEST": "GetFeature",
+                "TYPENAMES": typename,
+                "OUTPUTFORMAT": "geojson",
+                "SRSNAME": "urn:ogc:def:crs:OGC::CRS84",
+                "COUNT": 10000,
+                "BBOX": (
+                    f"{min_lon},{min_lat},"
+                    f"{max_lon},{max_lat},"
+                    "urn:ogc:def:crs:OGC::CRS84"
+                ),
+            },
+            timeout=90,
         )
+        response.raise_for_status()
+        data = response.json()
+
+        selected_features = []
+        for feature in data.get("features", []):
+            geometry = feature.get("geometry")
+            if geometry is None:
+                continue
+
+            try:
+                road_shape = shape(geometry)
+            except Exception:
+                continue
+
+            if road_shape.is_empty or not road_shape.intersects(
+                neighbourhood_shape
+            ):
+                continue
+
+            clipped = road_shape.intersection(neighbourhood_shape)
+            if clipped.is_empty:
+                continue
+
+            selected_features.append(
+                {
+                    "type": "Feature",
+                    "properties": {
+                        **(feature.get("properties", {}) or {}),
+                        "road_source_layer": typename,
+                    },
+                    "geometry": clipped.__geo_interface__,
+                }
+            )
+
+        if selected_features:
+            return {
+                "type": "FeatureCollection",
+                "features": selected_features,
+                "source_layer": typename,
+            }
 
     return {
         "type": "FeatureCollection",
-        "features": selected_features,
+        "features": [],
+        "source_layer": None,
     }
 
 
@@ -2251,7 +2278,7 @@ def create_amsterdam_gama_inputs(
 
     if road_count == 0:
         raise ValueError(
-            "No road lines were found for the selected Amsterdam neighbourhood."
+            "No BRT10 road centre/line features were found for the selected Amsterdam neighbourhood."
         )
 
     if location_counts.get("School", 0) == 0:

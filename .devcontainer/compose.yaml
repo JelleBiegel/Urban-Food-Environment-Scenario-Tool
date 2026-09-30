@@ -15,17 +15,7 @@ services:
     image: gamaplatform/gama:2025.06.4
     volumes:
       - ..:/workspaces/Urban-Food-Environment-Scenario-Tool:cached
-
-    entrypoint:
-      - "/bin/sh"
-      - "-c"
-
     command:
-      - >
-        /usr/lib/gama/headless/gama-headless.sh
-        -v
-        -socket 6868
-        2>&1 | tee
-        /workspaces/Urban-Food-Environment-Scenario-Tool/gama-server.log
-
+      - "-socket"
+      - "6868"
     restart: unless-stopped

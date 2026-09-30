@@ -12,20 +12,20 @@ services:
       GAMA_OUTPUT_PATH: /workspaces/Urban-Food-Environment-Scenario-Tool/Results/web_result.csv
 
   gama:
-  image: gamaplatform/gama:2025.06.4
-  volumes:
-    - ..:/workspaces/Urban-Food-Environment-Scenario-Tool:cached
+    image: gamaplatform/gama:2025.06.4
+    volumes:
+      - ..:/workspaces/Urban-Food-Environment-Scenario-Tool:cached
 
-  entrypoint:
-    - "/bin/sh"
-    - "-c"
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
 
-  command:
-    - >
-      /usr/lib/gama/headless/gama-headless.sh
-      -v
-      -socket 6868
-      2>&1 | tee
-      /workspaces/Urban-Food-Environment-Scenario-Tool/gama-server.log
+    command:
+      - >
+        /usr/lib/gama/headless/gama-headless.sh
+        -v
+        -socket 6868
+        2>&1 | tee
+        /workspaces/Urban-Food-Environment-Scenario-Tool/gama-server.log
 
-  restart: unless-stopped
+    restart: unless-stopped
